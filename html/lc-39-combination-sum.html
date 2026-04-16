@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Combination Sum — Learning Guide</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Playfair+Display:wght@700;900&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #121a2b;
+      --panel2: #17233a;
+      --text: #e6edf7;
+      --muted: #9fb0c9;
+      --line: rgba(255,255,255,.12);
+      --accent: #22d3ee;
+      --accent2: #fb7185;
+      --ok: #34d399;
+      --warn: #fbbf24;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:'Work Sans',sans-serif; background: radial-gradient(1200px 800px at 10% -10%, rgba(34,211,238,.12), transparent), radial-gradient(1000px 600px at 100% 0%, rgba(251,113,133,.1), transparent), var(--bg); color: var(--text); line-height:1.65; }
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 24px; }
+    header { border:1px solid var(--line); border-radius:16px; background: linear-gradient(140deg, rgba(18,26,43,.9), rgba(23,35,58,.85)); padding:24px; margin-bottom:18px; }
+    h1 { margin:0; font-family:'Playfair Display',serif; font-size:2.6rem; background: linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+    .meta { display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; }
+    .chip { font-size:.82rem; color:var(--muted); border:1px solid var(--line); border-radius:999px; padding:6px 12px; background:rgba(255,255,255,.02); }
+    .layout { display:grid; grid-template-columns: 280px 1fr; gap:18px; align-items:start; }
+    aside { position: sticky; top: 12px; border:1px solid var(--line); border-radius:12px; background:var(--panel); padding:14px; max-height: calc(100vh - 24px); overflow:auto; }
+    .toc-title { margin:0 0 10px; color:var(--accent); font-size:.95rem; letter-spacing:.03em; text-transform:uppercase; }
+    aside a { display:block; text-decoration:none; color:var(--muted); padding:6px 8px; border-radius:8px; font-size:.92rem; }
+    aside a:hover { background: rgba(34,211,238,.12); color:var(--text); }
+    .toc-h3 { padding-left:18px; font-size:.86rem; }
+    article { border:1px solid var(--line); border-radius:12px; background:var(--panel); padding:20px; }
+    h2 { margin-top:26px; margin-bottom:12px; font-size:1.7rem; color:var(--accent); }
+    h3 { margin-top:20px; margin-bottom:8px; font-size:1.2rem; color:#c4d9ff; }
+    h4 { margin-top:14px; margin-bottom:6px; font-size:1rem; color:#b9c8e4; }
+    p { color:var(--text); margin: 10px 0; }
+    ul,ol { margin: 10px 0 10px 22px; color:var(--text); }
+    li { margin: 4px 0; }
+    hr { border:none; border-top:1px solid var(--line); margin:20px 0; }
+    blockquote { border-left:4px solid var(--warn); margin:12px 0; padding:6px 14px; background:rgba(251,191,36,.08); border-radius:8px; }
+    .code-block { border:1px solid var(--line); border-radius:10px; overflow:hidden; margin:14px 0; background:#0b1020; }
+    .code-head { display:flex; justify-content:space-between; align-items:center; padding:8px 12px; border-bottom:1px solid var(--line); background:#10192d; font-family:'JetBrains Mono',monospace; font-size:.76rem; color:var(--muted); }
+    .copy-btn { background:transparent; border:1px solid var(--line); color:var(--muted); border-radius:6px; padding:4px 8px; cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:.74rem; }
+    .copy-btn:hover { border-color:var(--accent); color:var(--accent); }
+    pre { margin:0; padding:14px; overflow:auto; font-family:'JetBrains Mono',monospace; font-size:.84rem; line-height:1.5; color:#dbe6ff; }
+    table { width:100%; border-collapse: collapse; margin: 14px 0; }
+    th, td { border:1px solid var(--line); padding:8px 10px; text-align:left; font-size:.9rem; }
+    th { color:var(--accent); background:rgba(34,211,238,.08); }
+    .top-actions { display:flex; justify-content:flex-end; margin-bottom:10px; }
+    .btn { border:1px solid var(--line); color:var(--muted); text-decoration:none; padding:8px 12px; border-radius:8px; font-size:.84rem; }
+    .btn:hover { color:var(--text); border-color:var(--accent); }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } aside { position: relative; top:0; max-height:none; } h1 { font-size:2rem; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Combination Sum</h1>
+      <div class="meta">
+        <span class="chip">Platform: LeetCode / NeetCode</span>
+        <span class="chip">Difficulty: Medium</span>
+        <span class="chip">Pattern: Backtracking</span>
+        <span class="chip">Updated: 2026-04-16</span>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside>
+        <p class="toc-title">On This Page</p>
+        <a class="toc-h2" href="#problem-statement">Problem Statement</a>
+<a class="toc-h3" href="#challenge">Challenge</a>
+<a class="toc-h3" href="#examples">Examples</a>
+<a class="toc-h3" href="#key-insight">Key Insight</a>
+<a class="toc-h3" href="#complexity-snapshot">Complexity Snapshot</a>
+<a class="toc-h2" href="#core-concepts">Core Concepts</a>
+<a class="toc-h3" href="#concept-1-pattern-definition">Concept 1: Pattern Definition</a>
+<a class="toc-h3" href="#concept-2-decision-process-state-view">Concept 2: Decision Process / State View</a>
+<a class="toc-h3" href="#concept-3-when-to-use-this-pattern">Concept 3: When to Use This Pattern</a>
+<a class="toc-h3" href="#important-caveat">Important Caveat</a>
+<a class="toc-h2" href="#step-by-step-walkthrough">Step-by-Step Walkthrough</a>
+<a class="toc-h3" href="#complete-solution-primary">Complete Solution (Primary)</a>
+<a class="toc-h3" href="#dry-run">Dry Run</a>
+<a class="toc-h2" href="#interactive-visualizer-markdown-compatible-spec">Interactive Visualizer (Markdown-Compatible Spec)</a>
+<a class="toc-h3" href="#visualizer-input">Visualizer Input</a>
+<a class="toc-h3" href="#state-fields-to-track">State Fields to Track</a>
+<a class="toc-h3" href="#step-events">Step Events</a>
+<a class="toc-h3" href="#tree-graph-table-representation">Tree / Graph / Table Representation</a>
+<a class="toc-h2" href="#knowledge-check-quiz">Knowledge Check (Quiz)</a>
+<a class="toc-h2" href="#code-playground">Code Playground</a>
+<a class="toc-h3" href="#starter-code">Starter Code</a>
+<a class="toc-h3" href="#suggested-experiments">Suggested Experiments</a>
+<a class="toc-h2" href="#alternative-approaches">Alternative Approaches</a>
+<a class="toc-h3" href="#alternative-1-include-skip-binary-backtracking">Alternative 1: Include/Skip Binary Backtracking</a>
+<a class="toc-h3" href="#alternative-2-dp-by-sum-build-combinations">Alternative 2: DP by Sum (Build Combinations)</a>
+<a class="toc-h3" href="#comparison-table">Comparison Table</a>
+<a class="toc-h2" href="#common-mistakes">Common Mistakes</a>
+<a class="toc-h2" href="#flashcards">Flashcards</a>
+      </aside>
+
+      <article>
+        <div class="top-actions"><a class="btn" href="../index.html">Back to Index</a></div>
+        <h2 id="problem-statement">Problem Statement</h2>
+<h3 id="challenge">Challenge</h3>
+<p>Given a list of **distinct** integers `nums` and an integer `target`, return all unique combinations where chosen numbers sum to `target`.</p>
+<ul>
+<li>You can use each value in `nums` **unlimited times**.</li>
+<li>Two combinations are the same if they contain the same values with the same frequencies.</li>
+<li>Output order does not matter.</li>
+</ul>
+<h3 id="examples">Examples</h3>
+<h4 id="example-1">Example 1</h4>
+<ul>
+<li>Input: `nums = [2, 5, 6, 9], target = 9`</li>
+<li>Output: `[[2, 2, 5], [9]]`</li>
+<li>Explanation: `2 + 2 + 5 = 9` and `9 = 9`.</li>
+</ul>
+<h4 id="example-2">Example 2</h4>
+<ul>
+<li>Input: `nums = [3, 4, 5], target = 16`</li>
+<li>Output: `[[3,3,3,3,4], [3,3,5,5], [3,4,4,5], [4,4,4,4]]`</li>
+<li>Explanation: These are all unique frequency combinations that sum to 16.</li>
+</ul>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code>from typing import List
+
+class Solution:
+    def combinationSum(self, nums: List[int], target: int) -&gt; List[List[int]]:
+        nums.sort()
+        res = []
+        cur = []
+
+        def dfs(i, total):
+            if total == target:
+                res.append(cur.copy())
+                return
+            for j in range(i, len(nums)):
+                if total + nums[j] &gt; target:
+                    break
+                cur.append(nums[j])
+                dfs(j, total + nums[j])
+                cur.pop()
+
+        dfs(0, 0)
+        return res
+
+sol = Solution()
+
+out1 = sol.combinationSum([2, 5, 6, 9], 9)
+assert sorted(map(tuple, out1)) == sorted(map(tuple, [[2, 2, 5], [9]]))
+print(out1)
+
+out2 = sol.combinationSum([3, 4, 5], 16)
+assert sorted(map(tuple, out2)) == sorted(map(tuple, [[3,3,3,3,4], [3,3,5,5], [3,4,4,5], [4,4,4,4]]))
+print(out2)</code></pre>
+</div>
+<h3 id="key-insight">Key Insight</h3>
+<p>Build combinations in non-decreasing index order, so `[2,5,2]` is never generated separately from `[2,2,5]`. Backtracking explores candidate choices from index `i` onward, and reusing a number is done by recursing with the **same index**. Sorting enables pruning: once `total + nums[j] &gt; target`, all later values are also too large.</p>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code># Growth intuition for recursion depth bound ~ target / min(nums)
+def max_depth(target, nums):
+    return target // min(nums)
+
+print(max_depth(9, [2,5,6,9]))   # 4
+print(max_depth(16, [3,4,5]))    # 5</code></pre>
+</div>
+<h3 id="complexity-snapshot">Complexity Snapshot</h3>
+<ul>
+<li>Time: `O(2^(t/m))` (commonly cited backtracking bound)</li>
+<li>`t = target`, `m = min(nums)`</li>
+<li>Space: `O(t/m)` recursion depth (excluding output)</li>
+<li>Output size can be exponential and dominates in dense cases.</li>
+</ul>
+<hr>
+<h2 id="core-concepts">Core Concepts</h2>
+<h3 id="concept-1-pattern-definition">Concept 1: Pattern Definition</h3>
+<p>This is a backtracking problem where state is a partially built combination `cur` and current sum `total`. At each state, choose next candidate from current start index onward.</p>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code># Pattern skeleton (&lt;=10 lines)
+def dfs(i, total):
+    if total == target:
+        record(cur.copy())
+        return
+    for j in range(i, len(nums)):
+        if total + nums[j] &gt; target:
+            break
+        cur.append(nums[j])
+        dfs(j, total + nums[j])
+        cur.pop()</code></pre>
+</div>
+<h3 id="concept-2-decision-process-state-view">Concept 2: Decision Process / State View</h3>
+<p>State: `(i, cur, total)`</p>
+<ul>
+<li>`i`: minimum index allowed next (keeps combinations unique)</li>
+<li>`cur`: current chosen numbers</li>
+<li>`total`: sum of numbers in `cur`</li>
+</ul>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code>def trace_states(nums, target):
+    nums.sort()
+    cur = []
+
+    def dfs(i, total):
+        print(f&quot;enter i={i}, cur={cur}, total={total}&quot;)
+        if total == target:
+            print(f&quot;record i={i}, cur={cur}, total={total}&quot;)
+            return
+        for j in range(i, len(nums)):
+            nxt = total + nums[j]
+            if nxt &gt; target:
+                print(f&quot;prune j={j}, val={nums[j]}, total={total}&quot;)
+                break
+            print(f&quot;choose j={j}, val={nums[j]}&quot;)
+            cur.append(nums[j])
+            dfs(j, nxt)
+            cur.pop()
+            print(f&quot;backtrack j={j}, cur={cur}&quot;)
+
+    dfs(0, 0)
+
+trace_states([2, 5, 6, 9], 9)</code></pre>
+</div>
+<h3 id="concept-3-when-to-use-this-pattern">Concept 3: When to Use This Pattern</h3>
+<p>Use this pattern when:</p>
+<ul>
+<li>You need **all** combinations (not just count or one solution).</li>
+<li>Choices can be repeated (unbounded pick).</li>
+<li>Order should not create duplicates.</li>
+<li>Constraints are small enough for exponential search.</li>
+</ul>
+<p>Related problems:</p>
+<ul>
+<li>Combination Sum II</li>
+<li>Combination Sum III</li>
+<li>Subsets</li>
+<li>Permutations</li>
+<li>Palindrome Partitioning</li>
+</ul>
+<h3 id="important-caveat">Important Caveat</h3>
+<p>Most common mistake: moving to `j + 1` after choosing `nums[j]`. That incorrectly forbids reuse.</p>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code># WRONG: disallows reuse because it advances index after choosing
+from typing import List
+
+def wrong(nums: List[int], target: int) -&gt; List[List[int]]:
+    nums.sort()
+    res, cur = [], []
+
+    def dfs(i, total):
+        if total == target:
+            res.append(cur.copy())
+            return
+        for j in range(i, len(nums)):
+            if total + nums[j] &gt; target:
+                break
+            cur.append(nums[j])
+            dfs(j + 1, total + nums[j])  # BUG
+            cur.pop()
+
+    dfs(0, 0)
+    return res
+
+print(wrong([2,3,6,7], 7))  # misses [2,2,3]
+
+# FIX: recurse with dfs(j, ...) so same value can be picked again</code></pre>
+</div>
+<hr>
+<h2 id="step-by-step-walkthrough">Step-by-Step Walkthrough</h2>
+<ol>
+<li>Initialize result and path containers.</li>
+</ol>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code>res = []
+cur = []
+nums.sort()</code></pre>
+</div>
+<p>Why: `res` stores complete answers, `cur` is current path, sorting enables prune.</p>
+<ol>
+<li>Define DFS state `(i, total)`.</li>
+</ol>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code>def dfs(i, total):
+    ...</code></pre>
+</div>
+<p>Why: `i` controls allowed indices (uniqueness), `total` tracks current sum.</p>
+<ol>
+<li>Base case when target is reached.</li>
+</ol>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code>if total == target:
+    res.append(cur.copy())
+    return</code></pre>
+</div>
+<p>Why: this path is a valid combination.</p>
+<ol>
+<li>Iterate choices from `i` onward.</li>
+</ol>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code>for j in range(i, len(nums)):
+    ...</code></pre>
+</div>
+<p>Why: prevents generating permutations of same combination.</p>
+<ol>
+<li>Prune impossible branches.</li>
+</ol>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code>if total + nums[j] &gt; target:
+    break</code></pre>
+</div>
+<p>Why: sorted array guarantees later numbers are larger.</p>
+<ol>
+<li>Choose current number and recurse.</li>
+</ol>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code>cur.append(nums[j])
+dfs(j, total + nums[j])</code></pre>
+</div>
+<p>Why: `j` (not `j+1`) allows unlimited reuse.</p>
+<ol>
+<li>Backtrack to restore state.</li>
+</ol>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code>cur.pop()</code></pre>
+</div>
+<p>Why: removes last decision before trying next candidate.</p>
+<ol>
+<li>Start DFS and return result.</li>
+</ol>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code>dfs(0, 0)
+return res</code></pre>
+</div>
+<p>Why: begin with empty path and sum zero.</p>
+<h3 id="complete-solution-primary">Complete Solution (Primary)</h3>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code>from typing import List
+
+class Solution:
+    def combinationSum(self, nums: List[int], target: int) -&gt; List[List[int]]:
+        nums.sort()
+        res = []
+        cur = []
+
+        def dfs(i, total):
+            if total == target:
+                res.append(cur.copy())
+                return
+
+            for j in range(i, len(nums)):
+                nxt = total + nums[j]
+                if nxt &gt; target:
+                    break
+                cur.append(nums[j])
+                dfs(j, nxt)
+                cur.pop()
+
+        dfs(0, 0)
+        return res
+
+print(Solution().combinationSum([2, 5, 6, 9], 9))
+# Expected: [[2, 2, 5], [9]] (order may vary)</code></pre>
+</div>
+<h3 id="dry-run">Dry Run</h3>
+<p>Input: `nums = [2, 5, 6, 9]`, `target = 9`</p>
+<ul>
+<li>Start `dfs(0,0)`, `cur=[]`</li>
+<li>Choose `2` -&gt; `cur=[2]`, total 2</li>
+<li>Choose `2` -&gt; `cur=[2,2]`, total 4</li>
+<li>Choose `2` -&gt; total 6</li>
+<li>Choose `2` -&gt; total 8</li>
+<li>Next `2` would make 10, prune branch</li>
+<li>Try `5` from total 4 -&gt; total 9, record `[2,2,5]`</li>
+<li>Backtrack and try higher values; only `[9]` reaches target from root</li>
+</ul>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code>def dry_run_trace(nums, target):
+    nums.sort()
+    res = []
+    cur = []
+
+    def dfs(i, total):
+        print(f&quot;enter i={i}, total={total}, cur={cur}&quot;)
+        if total == target:
+            print(f&quot;record {cur}&quot;)
+            res.append(cur.copy())
+            return
+
+        for j in range(i, len(nums)):
+            nxt = total + nums[j]
+            if nxt &gt; target:
+                print(f&quot;prune at j={j}, val={nums[j]}, total={total}&quot;)
+                break
+            cur.append(nums[j])
+            print(f&quot;choose {nums[j]} -&gt; cur={cur}&quot;)
+            dfs(j, nxt)
+            cur.pop()
+            print(f&quot;backtrack -&gt; cur={cur}&quot;)
+
+    dfs(0, 0)
+    return res
+
+print(dry_run_trace([2, 5, 6, 9], 9))</code></pre>
+</div>
+<hr>
+<h2 id="interactive-visualizer-markdown-compatible-spec">Interactive Visualizer (Markdown-Compatible Spec)</h2>
+<h3 id="visualizer-input">Visualizer Input</h3>
+<ul>
+<li>Format: `{ &quot;nums&quot;: List[int], &quot;target&quot;: int }`</li>
+<li>Sample: `{ &quot;nums&quot;: [2, 5, 6, 9], &quot;target&quot;: 9 }`</li>
+</ul>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code>sample = {&quot;nums&quot;: [2, 5, 6, 9], &quot;target&quot;: 9}</code></pre>
+</div>
+<h3 id="state-fields-to-track">State Fields to Track</h3>
+<ul>
+<li>`i`: current start index</li>
+<li>`j`: current choice index in loop</li>
+<li>`cur`: current path</li>
+<li>`total`: current sum</li>
+<li>`action`: `enter|choose|record|prune|backtrack`</li>
+<li>`res_count`: number of found combinations</li>
+</ul>
+<h3 id="step-events">Step Events</h3>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code>def event_stream(nums, target):
+    nums = sorted(nums)
+    cur = []
+    res = []
+
+    def dfs(i, total):
+        yield {&quot;action&quot;: &quot;enter&quot;, &quot;i&quot;: i, &quot;j&quot;: None, &quot;cur&quot;: cur.copy(), &quot;total&quot;: total, &quot;res_count&quot;: len(res)}
+        if total == target:
+            res.append(cur.copy())
+            yield {&quot;action&quot;: &quot;record&quot;, &quot;i&quot;: i, &quot;j&quot;: None, &quot;cur&quot;: cur.copy(), &quot;total&quot;: total, &quot;res_count&quot;: len(res)}
+            return
+        for j in range(i, len(nums)):
+            nxt = total + nums[j]
+            if nxt &gt; target:
+                yield {&quot;action&quot;: &quot;prune&quot;, &quot;i&quot;: i, &quot;j&quot;: j, &quot;cur&quot;: cur.copy(), &quot;total&quot;: total, &quot;res_count&quot;: len(res)}
+                break
+            cur.append(nums[j])
+            yield {&quot;action&quot;: &quot;choose&quot;, &quot;i&quot;: i, &quot;j&quot;: j, &quot;cur&quot;: cur.copy(), &quot;total&quot;: nxt, &quot;res_count&quot;: len(res)}
+            yield from dfs(j, nxt)
+            cur.pop()
+            yield {&quot;action&quot;: &quot;backtrack&quot;, &quot;i&quot;: i, &quot;j&quot;: j, &quot;cur&quot;: cur.copy(), &quot;total&quot;: total, &quot;res_count&quot;: len(res)}
+
+    yield from dfs(0, 0)
+
+for e in event_stream([2,5,6,9], 9):
+    print(e)</code></pre>
+</div>
+<h3 id="tree-graph-table-representation">Tree / Graph / Table Representation</h3>
+<p>Render as recursion tree where each node is `(cur,total)` and edge label is chosen value.</p>
+<hr>
+<h2 id="knowledge-check-quiz">Knowledge Check (Quiz)</h2>
+<ol>
+<li>What is the typical backtracking complexity bound for this problem?</li>
+<p>A. `O(n)` B. `O(n log n)` C. `O(2^(t/m))` D. `O(t^2)`</p>
+</ol>
+<p>Correct: **C**</p>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code># Depth is bounded by target/min(nums), tree branching makes it exponential.
+target, nums = 16, [3,4,5]
+m = min(nums)
+print(target // m)  # depth upper bound indicator</code></pre>
+</div>
+<ol>
+<li>Which invariant prevents duplicate permutations?</li>
+<p>A. Always sort output at the end B. Always recurse with j+1 C. Only choose indices from current i forward D. Use a set of tuples for every path</p>
+</ol>
+<p>Correct: **C**</p>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code># Forward-only index progression yields canonical order in each path.
+def demo_forward_only():
+    nums = [2,3]
+    paths = []
+    cur = []
+    def dfs(i, total):
+        if total == 5:
+            paths.append(cur.copy())
+            return
+        for j in range(i, len(nums)):
+            if total + nums[j] &gt; 5:
+                break
+            cur.append(nums[j])
+            dfs(j, total + nums[j])
+            cur.pop()
+    dfs(0, 0)
+    print(paths)  # [[2,3]] no [3,2]
+
+demo_forward_only()</code></pre>
+</div>
+<ol>
+<li>Edge case: `nums=[3]`, `target=5`. Output?</li>
+<p>A. `[[3,2]]` B. `[[3]]` C. `[]` D. Error</p>
+</ol>
+<p>Correct: **C**</p>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code>print(Solution().combinationSum([3], 5))  # []</code></pre>
+</div>
+<ol>
+<li>Implementation pitfall: after choosing `nums[j]`, next call should be?</li>
+<p>A. `dfs(j + 1, total + nums[j])` B. `dfs(0, total + nums[j])` C. `dfs(j, total + nums[j])` D. `dfs(i + 1, total + nums[j])`</p>
+</ol>
+<p>Correct: **C**</p>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code># Reuse requires staying at j.
+nums = [2,3,6,7]
+print(Solution().combinationSum(nums, 7))  # contains [2,2,3]</code></pre>
+</div>
+<hr>
+<h2 id="code-playground">Code Playground</h2>
+<h3 id="starter-code">Starter Code</h3>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code>from typing import List
+
+class Solution:
+    def combinationSum(self, nums: List[int], target: int) -&gt; List[List[int]]:
+        nums.sort()
+        res = []
+        cur = []
+
+        def dfs(i, total):
+            # TODO: if total == target, append copy of cur to res
+            # TODO: iterate j from i to len(nums)-1
+            # TODO: prune when total + nums[j] &gt; target
+            # TODO: choose nums[j], recurse with dfs(j, ...), backtrack
+            pass
+
+        dfs(0, 0)
+        return res
+
+print(Solution().combinationSum([2,5,6,9], 9))
+# Expected (order may vary): [[2,2,5], [9]]</code></pre>
+</div>
+<h3 id="suggested-experiments">Suggested Experiments</h3>
+<ol>
+<li>Constraint variant: each number can be used at most `k` times.</li>
+</ol>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code>from typing import List
+
+def combinationSum_k(nums: List[int], target: int, k: int) -&gt; List[List[int]]:
+    # TODO: backtracking with usage count limit k per value
+    return []
+
+print(combinationSum_k([2,3,5], 8, 2))</code></pre>
+</div>
+<ol>
+<li>Alternative paradigm: iterative DP that stores combinations by sum.</li>
+</ol>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code>from typing import List
+
+def combinationSum_dp(nums: List[int], target: int) -&gt; List[List[int]]:
+    # TODO: dp[s] = list of combinations that sum to s
+    return []
+
+print(combinationSum_dp([2,3,6,7], 7))</code></pre>
+</div>
+<ol>
+<li>Optimization task: count combinations without listing them.</li>
+</ol>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code>from typing import List
+
+def countCombinationSum(nums: List[int], target: int) -&gt; int:
+    # TODO: return number of unique combinations (order-insensitive)
+    return 0
+
+print(countCombinationSum([2,3,6,7], 7))  # expected 2</code></pre>
+</div>
+<hr>
+<h2 id="alternative-approaches">Alternative Approaches</h2>
+<h3 id="alternative-1-include-skip-binary-backtracking">Alternative 1: Include/Skip Binary Backtracking</h3>
+<p>Intuition: at each index, either include current value (stay at same index) or skip it (move to next index).</p>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code>from typing import List
+
+def combinationSum_include_skip(nums: List[int], target: int) -&gt; List[List[int]]:
+    res = []
+    cur = []
+
+    def dfs(i, total):
+        if total == target:
+            res.append(cur.copy())
+            return
+        if i &gt;= len(nums) or total &gt; target:
+            return
+
+        cur.append(nums[i])
+        dfs(i, total + nums[i])
+        cur.pop()
+
+        dfs(i + 1, total)
+
+    dfs(0, 0)
+    return res
+
+print(combinationSum_include_skip([2,5,6,9], 9))
+# Expected (order may vary): [[2,2,5], [9]]</code></pre>
+</div>
+<ul>
+<li>Time: `O(2^(t/m))`</li>
+<li>Space: `O(t/m)`</li>
+<li>Prefer when teaching decision-tree include/exclude pattern.</li>
+</ul>
+<h3 id="alternative-2-dp-by-sum-build-combinations">Alternative 2: DP by Sum (Build Combinations)</h3>
+<p>Intuition: build combinations for each sum from `0` to `target`, ensuring non-decreasing order to avoid duplicates.</p>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code>from typing import List
+
+def combinationSum_dp(nums: List[int], target: int) -&gt; List[List[int]]:
+    nums.sort()
+    dp = [[] for _ in range(target + 1)]
+    dp[0] = [[]]
+
+    for num in nums:
+        for s in range(num, target + 1):
+            for prev in dp[s - num]:
+                if not prev or prev[-1] &lt;= num:
+                    dp[s].append(prev + [num])
+
+    return dp[target]
+
+print(combinationSum_dp([2,5,6,9], 9))
+# Expected (order may vary): [[2,2,5], [9]]</code></pre>
+</div>
+<ul>
+<li>Time: roughly `O(target * K)` where `K` depends on combination counts</li>
+<li>Space: `O(total combinations stored across dp)`</li>
+<li>Prefer when you want bottom-up construction and no recursion.</li>
+</ul>
+<h3 id="comparison-table">Comparison Table</h3>
+<table><tbody>
+<tr><th>Approach</th><th>Pros</th><th>Cons</th><th>Time</th><th>Space</th><th>Best Use Case</th></tr>
+<tr><td>Sorted-loop backtracking (primary)</td><td>Clean, strong pruning, interview-standard</td><td>Still exponential worst-case</td><td>`O(2^(t/m))`</td><td>`O(t/m)` + output</td><td>Most interviews</td></tr>
+<tr><td>Include/skip backtracking</td><td>Very intuitive decision tree</td><td>More branches, less pruning</td><td>`O(2^(t/m))`</td><td>`O(t/m)` + output</td><td>Learning recursion pattern</td></tr>
+<tr><td>DP by sum</td><td>Iterative, no recursion stack</td><td>Higher memory, trickier dedupe logic</td><td>Output-dependent</td><td>Output-dependent</td><td>Small `target`, iterative preference</td></tr>
+</tbody></table>
+<hr>
+<h2 id="common-mistakes">Common Mistakes</h2>
+<ol>
+<li>Recurse with `j + 1` after choose (breaks reuse)</li>
+</ol>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code># Wrong
+from typing import List
+
+def wrong_reuse(nums: List[int], target: int) -&gt; List[List[int]]:
+    nums.sort()
+    res, cur = [], []
+    def dfs(i, total):
+        if total == target:
+            res.append(cur.copy())
+            return
+        for j in range(i, len(nums)):
+            if total + nums[j] &gt; target:
+                break
+            cur.append(nums[j])
+            dfs(j + 1, total + nums[j])
+            cur.pop()
+    dfs(0, 0)
+    return res
+
+print(wrong_reuse([2,3,6,7], 7))  # misses [2,2,3]</code></pre>
+</div>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code># Correct
+print(Solution().combinationSum([2,3,6,7], 7))  # includes [2,2,3] and [7]</code></pre>
+</div>
+<p>Why fails: advancing index forbids picking the same number again. Quick check: verify `[2,2,3]` exists for target 7 on `[2,3,6,7]`.</p>
+<ol>
+<li>Forgetting to backtrack (`cur.pop()`)</li>
+</ol>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code># Wrong
+from typing import List
+
+def wrong_no_pop(nums: List[int], target: int) -&gt; List[List[int]]:
+    nums.sort()
+    res, cur = [], []
+    def dfs(i, total):
+        if total == target:
+            res.append(cur.copy())
+            return
+        for j in range(i, len(nums)):
+            if total + nums[j] &gt; target:
+                break
+            cur.append(nums[j])
+            dfs(j, total + nums[j])
+            # missing cur.pop()
+    dfs(0, 0)
+    return res
+
+print(wrong_no_pop([2,5,6,9], 9))  # corrupted paths</code></pre>
+</div>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code># Correct: always pop after recursive call
+print(Solution().combinationSum([2,5,6,9], 9))</code></pre>
+</div>
+<p>Why fails: sibling branches inherit stale choices. Quick check: ensure path length returns to previous size after each recursion.</p>
+<ol>
+<li>Not pruning when sorted candidate already exceeds target</li>
+</ol>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code># Wrong-ish (correct but inefficient)
+from typing import List
+
+def slow_version(nums: List[int], target: int) -&gt; int:
+    nums.sort()
+    calls = 0
+    cur = []
+    def dfs(i, total):
+        nonlocal calls
+        calls += 1
+        if total == target:
+            return
+        if total &gt; target:
+            return
+        for j in range(i, len(nums)):
+            cur.append(nums[j])
+            dfs(j, total + nums[j])
+            cur.pop()
+    dfs(0, 0)
+    return calls
+
+print(slow_version([2,3,6,7], 7))</code></pre>
+</div>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code># Correct pruning strategy is in Solution().combinationSum with early break
+print(Solution().combinationSum([2,3,6,7], 7))</code></pre>
+</div>
+<p>Why fails: explores many guaranteed-dead branches. Quick check: with sorted nums, use `if total + nums[j] &gt; target: break`.</p>
+<ol>
+<li>Appending `cur` directly instead of copy</li>
+</ol>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code># Wrong
+from typing import List
+
+def wrong_ref(nums: List[int], target: int) -&gt; List[List[int]]:
+    nums.sort()
+    res, cur = [], []
+    def dfs(i, total):
+        if total == target:
+            res.append(cur)  # BUG: reference
+            return
+        for j in range(i, len(nums)):
+            if total + nums[j] &gt; target:
+                break
+            cur.append(nums[j])
+            dfs(j, total + nums[j])
+            cur.pop()
+    dfs(0, 0)
+    return res
+
+print(wrong_ref([2,5,6,9], 9))  # often ends up mutated/incorrect</code></pre>
+</div>
+<div class="code-block">
+<div class="code-head">
+<span>python</span>
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+</div>
+<pre><code># Correct
+print(Solution().combinationSum([2,5,6,9], 9))</code></pre>
+</div>
+<p>Why fails: all saved answers point to same mutable list. Quick check: always save `cur.copy()`.</p>
+<hr>
+<h2 id="flashcards">Flashcards</h2>
+<ol>
+<li>**Base case / stopping condition**</li>
+<p>Q: When do we record and stop a path in Combination Sum? A: Record when `total == target`; prune branch when next sorted number makes sum exceed target.</p>
+</ol>
+<ol>
+<li>**Complexity reasoning**</li>
+<p>Q: Why is complexity exponential? A: The recursion explores many candidate-branch combinations up to depth about `target / min(nums)`, giving a standard `O(2^(t/m))` backtracking bound.</p>
+</ol>
+<ol>
+<li>**Core pattern intuition**</li>
+<p>Q: What enforces uniqueness without a set? A: Restrict choices to indices `j &gt;= i` and recurse with same `j` for reuse; this keeps each path in non-decreasing index order.</p>
+</ol>
+      </article>
+    </div>
+  </div>
+
+  <script>
+    function copyCode(btn) {
+      const code = btn.closest('.code-block').querySelector('code').innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        const old = btn.textContent;
+        btn.textContent = 'Copied';
+        setTimeout(() => btn.textContent = old, 900);
+      });
+    }
+  </script>
+</body>
+</html>
