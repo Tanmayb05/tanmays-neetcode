@@ -403,7 +403,23 @@ Back: ...
 4. ...
 ```
 
-## 6. File Naming Convention
+## 6. HTML Reference File
+
+A canonical reference HTML file is stored at `REFERENCE.html` in the project root.
+
+**When converting any `.md` guide to `.html`, always read `REFERENCE.html` first** and match its:
+
+- CSS variables, fonts, and dark-theme styling exactly.
+- HTML structure: `progress-bar`, `problem-header`, `nav`, `.container > .section` layout.
+- All component classes: `.card`, `.stats-grid`, `.stat-card`, `.code-block`, `.tabs`, `.tab-content`, `.steps-list`, `.step`, `.quiz-block`, `.quiz-opt`, `.fc-wrap`, `.fc`, `.mistake-pair`, `.cmp-table`, `.dr-table`, `.checklist`, `.alert`, `.btn`, `.editor`, `.run-output`, `.viz-wrap`.
+- JavaScript: section navigation, inner tabs, progress bar, quiz logic, copy-button, playground run/reset/show-solution, visualizer.
+- Syntax highlighting span classes: `.kw`, `.fn`, `.st`, `.cm`, `.nm`.
+
+Only the problem-specific content changes (title, tagline, nav LC number, section text, code, dry-run table, quiz questions, mistakes, flashcards, mnemonic, next steps).
+
+---
+
+## 7. File Naming Convention
 
 All guide files must follow the pattern: `lc-{problem_number}-{slug}.{ext}`
 
