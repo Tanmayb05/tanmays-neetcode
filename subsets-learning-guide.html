@@ -37,59 +37,34 @@
             overflow-x: hidden;
         }
 
-        .hero {
-            min-height: 100vh;
+        .problem-header {
+            max-width: 1200px;
+            margin: 1.5rem auto 1rem;
+            padding: 1.75rem 2rem;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(20, 24, 37, 0.96), rgba(30, 36, 51, 0.92));
             display: flex;
             align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #0a0e1a 0%, #1e2433 100%);
-            position: relative;
-            overflow: hidden;
+            justify-content: space-between;
+            gap: 1rem;
         }
 
-        .hero::before {
-            content: '';
-            position: absolute;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(0, 212, 255, 0.15) 0%, transparent 70%);
-            top: -200px;
-            right: -200px;
-            animation: float 20s ease-in-out infinite;
+        .problem-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
         }
 
-        .hero::after {
-            content: '';
-            position: absolute;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(255, 0, 110, 0.1) 0%, transparent 70%);
-            bottom: -150px;
-            left: -150px;
-            animation: float 15s ease-in-out infinite reverse;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            50% { transform: translate(50px, 50px) rotate(180deg); }
-        }
-
-        .hero-content {
-            text-align: center;
-            z-index: 1;
-            max-width: 900px;
-            padding: 2rem;
-        }
-
-        .hero h1 {
+        .problem-title {
             font-family: 'Playfair Display', serif;
-            font-size: 5rem;
+            font-size: 2.5rem;
             font-weight: 900;
             background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 1rem;
+            margin: 0;
             animation: slideDown 1s ease-out;
         }
 
@@ -98,10 +73,10 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .hero .tagline {
-            font-size: 1.5rem;
+        .problem-tagline {
+            font-size: 1.1rem;
             color: var(--text-secondary);
-            margin-bottom: 3rem;
+            margin: 0;
             animation: fadeIn 1s ease-out 0.3s backwards;
         }
 
@@ -118,27 +93,8 @@
             border-radius: 30px;
             color: var(--warning);
             font-weight: 600;
-            margin-bottom: 2rem;
+            margin: 0;
             animation: fadeIn 1s ease-out 0.5s backwards;
-        }
-
-        .scroll-indicator {
-            position: absolute;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            animation: bounce 2s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateX(-50%) translateY(0); }
-            50% { transform: translateX(-50%) translateY(-20px); }
-        }
-
-        .scroll-indicator::before {
-            content: '↓';
-            font-size: 2rem;
-            color: var(--accent-primary);
         }
 
         nav {
@@ -158,17 +114,23 @@
             display: flex;
             gap: 2rem;
             list-style: none;
+            flex-wrap: wrap;
         }
 
-        .nav-links a {
+        .nav-tab-link {
             color: var(--text-secondary);
             text-decoration: none;
             font-weight: 500;
             transition: color 0.3s;
             position: relative;
+            background: transparent;
+            border: none;
+            padding: 0;
+            font: inherit;
+            cursor: pointer;
         }
 
-        .nav-links a::after {
+        .nav-tab-link::after {
             content: '';
             position: absolute;
             bottom: -5px;
@@ -179,12 +141,49 @@
             transition: width 0.3s;
         }
 
-        .nav-links a:hover {
+        .nav-tab-link:hover {
             color: var(--accent-primary);
         }
 
-        .nav-links a:hover::after {
+        .nav-tab-link:hover::after,
+        .nav-tab-link.active::after {
             width: 100%;
+        }
+
+        .nav-tab-link.active {
+            color: var(--accent-primary);
+        }
+
+        .section {
+            display: none;
+            opacity: 1;
+            transform: none;
+            transition: none;
+        }
+
+        .section.active-page {
+            display: block;
+            animation: fadeIn 0.35s ease;
+        }
+
+        .section.visible {
+            opacity: 1;
+            transform: none;
+        }
+
+        .progress-tracker {
+            display: none;
+        }
+
+        @media (max-width: 1024px) {
+            nav {
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
         }
 
         .progress-bar {
@@ -496,6 +495,55 @@
             min-height: 400px;
         }
 
+        .tree-svg {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .tree-link {
+            stroke: rgba(255, 255, 255, 0.2);
+            stroke-width: 2;
+        }
+
+        .tree-link.active {
+            stroke: var(--accent-primary);
+            stroke-width: 3;
+        }
+
+        .tree-node-circle {
+            fill: var(--bg-secondary);
+            stroke: var(--border);
+            stroke-width: 2;
+            transition: all 0.2s ease;
+        }
+
+        .tree-node-circle.active {
+            fill: var(--accent-primary);
+            stroke: var(--accent-primary);
+        }
+
+        .tree-node-circle.leaf {
+            fill: rgba(0, 255, 148, 0.15);
+            stroke: var(--success);
+        }
+
+        .tree-node-text {
+            fill: var(--text-primary);
+            font-size: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            text-anchor: middle;
+            dominant-baseline: middle;
+            pointer-events: none;
+        }
+
+        .tree-node-label {
+            fill: var(--text-secondary);
+            font-size: 11px;
+            font-family: 'JetBrains Mono', monospace;
+            text-anchor: middle;
+            pointer-events: none;
+        }
+
         .controls {
             display: flex;
             gap: 1rem;
@@ -747,8 +795,15 @@
         }
 
         @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 3rem;
+            .problem-header {
+                margin: 1rem;
+                padding: 1.25rem;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .problem-title {
+                font-size: 2rem;
             }
 
             .section-title {
@@ -830,23 +885,28 @@
 <body>
     <div class="progress-bar" id="progressBar"></div>
 
-    <div class="hero">
-        <div class="hero-content">
-            <div class="difficulty-badge">MEDIUM</div>
-            <h1>Subsets</h1>
-            <p class="tagline">Master the art of backtracking through power set generation</p>
+    <header class="problem-header">
+        <div class="problem-meta">
+            <h1 class="problem-title">Subsets</h1>
+            <p class="problem-tagline">Master the art of backtracking through power set generation</p>
         </div>
-        <div class="scroll-indicator"></div>
-    </div>
+        <div class="difficulty-badge">MEDIUM</div>
+    </header>
 
     <nav id="mainNav">
         <div style="font-weight: 700; font-size: 1.2rem; color: var(--accent-primary);">Subsets Guide</div>
         <ul class="nav-links">
-            <li><a href="#problem">Problem</a></li>
-            <li><a href="#concepts">Concepts</a></li>
-            <li><a href="#walkthrough">Walkthrough</a></li>
-            <li><a href="#quiz">Quiz</a></li>
-            <li><a href="#playground">Playground</a></li>
+            <li><a href="#problem" class="nav-tab-link" data-section="problem">Problem</a></li>
+            <li><a href="#concepts" class="nav-tab-link" data-section="concepts">Concepts</a></li>
+            <li><a href="#walkthrough" class="nav-tab-link" data-section="walkthrough">Walkthrough</a></li>
+            <li><a href="#visualizer-section" class="nav-tab-link" data-section="visualizer-section">Visualizer</a></li>
+            <li><a href="#quiz" class="nav-tab-link" data-section="quiz">Quiz</a></li>
+            <li><a href="#playground" class="nav-tab-link" data-section="playground">Playground</a></li>
+            <li><a href="#alternatives" class="nav-tab-link" data-section="alternatives">Alternatives</a></li>
+            <li><a href="#mistakes" class="nav-tab-link" data-section="mistakes">Mistakes</a></li>
+            <li><a href="#flashcards" class="nav-tab-link" data-section="flashcards">Flashcards</a></li>
+            <li><a href="#reference" class="nav-tab-link" data-section="reference">Reference</a></li>
+            <li><a href="#next-steps" class="nav-tab-link" data-section="next-steps">Next Steps</a></li>
         </ul>
     </nav>
 
@@ -1621,7 +1681,7 @@ current_subset.<span class="function">pop</span>()  <span class="comment"># Esse
             </div>
         </section>
 
-        <section class="section">
+        <section id="next-steps" class="section">
             <div class="card" style="text-align: center; background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));">
                 <h2 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-bottom: 1rem;">
                     Keep Learning! 🚀
@@ -1662,23 +1722,50 @@ current_subset.<span class="function">pop</span>()  <span class="comment"># Esse
             document.getElementById('progressBar').style.width = scrolled + '%';
         });
 
-        // Intersection Observer for sections
-        const sections = document.querySelectorAll('.section');
-        const observerOptions = {
-            threshold: 0.1
-        };
+        // Top-level page tabs (show one section at a time)
+        const pageSections = Array.from(document.querySelectorAll('.container > .section'));
+        const sectionTabs = Array.from(document.querySelectorAll('.nav-tab-link'));
+        const pageSectionIds = new Set(pageSections.map(section => section.id));
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
+        function showSection(sectionId) {
+            if (!pageSectionIds.has(sectionId)) return;
+
+            pageSections.forEach(section => {
+                section.classList.toggle('active-page', section.id === sectionId);
+                section.classList.toggle('visible', section.id === sectionId);
             });
-        }, observerOptions);
 
-        sections.forEach(section => {
-            observer.observe(section);
+            sectionTabs.forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.section === sectionId);
+            });
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function initPageTabs() {
+            sectionTabs.forEach(tab => {
+                tab.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const sectionId = tab.dataset.section;
+                    showSection(sectionId);
+                    window.history.replaceState(null, '', `#${sectionId}`);
+                });
+            });
+
+            const hashSectionId = window.location.hash.replace('#', '');
+            const defaultSectionId = sectionTabs[0]?.dataset.section;
+            const initialSectionId = pageSectionIds.has(hashSectionId) ? hashSectionId : defaultSectionId;
+            if (initialSectionId) showSection(initialSectionId);
+        }
+
+        window.addEventListener('hashchange', () => {
+            const hashSectionId = window.location.hash.replace('#', '');
+            if (pageSectionIds.has(hashSectionId)) {
+                showSection(hashSectionId);
+            }
         });
+
+        initPageTabs();
 
         // Tab switching
         function switchTab(event, tabName) {
@@ -1759,6 +1846,126 @@ current_subset.<span class="function">pop</span>()  <span class="comment"># Esse
         // Visualizer
         let vizSteps = [];
         let vizCurrentStep = 0;
+        let vizTreeNodes = [];
+
+        function subsetKey(subset) {
+            return `[${subset.join(',')}]`;
+        }
+
+        function buildTreeData(nums) {
+            const nodes = [];
+            const links = [];
+            let nodeCounter = 0;
+
+            function createNode(depth, path, subset, isLeaf = false) {
+                const id = nodeCounter++;
+                const node = {
+                    id,
+                    depth,
+                    path,
+                    subset: [...subset],
+                    key: `${depth}|${path}`,
+                    isLeaf
+                };
+                nodes.push(node);
+                return node;
+            }
+
+            function dfs(i, subset, path, parentId = null) {
+                const node = createNode(i, path, subset, i === nums.length);
+                if (parentId !== null) {
+                    links.push({ from: parentId, to: node.id });
+                }
+
+                if (i >= nums.length) return;
+
+                subset.push(nums[i]);
+                dfs(i + 1, subset, `${path}I`, node.id);
+                subset.pop();
+
+                dfs(i + 1, subset, `${path}E`, node.id);
+            }
+
+            dfs(0, [], '');
+            return { nodes, links };
+        }
+
+        function renderTree(nums) {
+            const treeViz = document.getElementById('treeViz');
+            const { nodes, links } = buildTreeData(nums);
+            vizTreeNodes = nodes;
+
+            const levels = nums.length + 1;
+            const hGap = 170;
+            const vGap = 90;
+            const padding = 50;
+            const width = Math.max(700, Math.pow(2, nums.length) * hGap / 2 + padding * 2);
+            const maxNodesInLevel = Math.pow(2, nums.length);
+            const height = Math.max(400, levels * vGap + padding * 2);
+
+            const nodesByDepth = Array.from({ length: levels }, () => []);
+            nodes.forEach(node => nodesByDepth[node.depth].push(node));
+
+            nodesByDepth.forEach((levelNodes, depth) => {
+                levelNodes.sort((a, b) => a.path.localeCompare(b.path));
+                const total = levelNodes.length;
+                const levelWidth = Math.max(width - padding * 2, total * 60);
+                const startX = (width - levelWidth) / 2;
+
+                levelNodes.forEach((node, idx) => {
+                    node.y = padding + depth * vGap;
+                    node.x = total === 1 ? width / 2 : startX + (idx * levelWidth) / (total - 1);
+                });
+            });
+
+            const nodeById = new Map(nodes.map(node => [node.id, node]));
+            const linksSvg = links.map(link => {
+                const from = nodeById.get(link.from);
+                const to = nodeById.get(link.to);
+                return `<line id="tree-link-${link.from}-${link.to}" class="tree-link" x1="${from.x}" y1="${from.y + 28}" x2="${to.x}" y2="${to.y - 28}"></line>`;
+            }).join('');
+
+            const nodesSvg = nodes.map(node => {
+                const subsetText = subsetKey(node.subset) || '[]';
+                return `
+                    <g id="tree-node-${node.id}">
+                        <circle class="tree-node-circle ${node.isLeaf ? 'leaf' : ''}" cx="${node.x}" cy="${node.y}" r="28"></circle>
+                        <text class="tree-node-text" x="${node.x}" y="${node.y}">${node.depth}</text>
+                        <text class="tree-node-label" x="${node.x}" y="${node.y + 45}">${subsetText}</text>
+                    </g>
+                `;
+            }).join('');
+
+            treeViz.innerHTML = `
+                <svg class="tree-svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" aria-label="Decision tree visualization">
+                    ${linksSvg}
+                    ${nodesSvg}
+                </svg>
+            `;
+        }
+
+        function clearTreeHighlights() {
+            document.querySelectorAll('.tree-node-circle').forEach(node => node.classList.remove('active'));
+            document.querySelectorAll('.tree-link').forEach(link => link.classList.remove('active'));
+        }
+
+        function highlightTreeForStep(step) {
+            clearTreeHighlights();
+            const node = vizTreeNodes.find(n => n.depth === step.index && subsetKey(n.subset) === subsetKey(step.subset));
+            if (!node) return;
+
+            const nodeGroup = document.querySelector(`#tree-node-${node.id} .tree-node-circle`);
+            if (nodeGroup) nodeGroup.classList.add('active');
+
+            if (node.path.length > 0) {
+                const parentPath = node.path.slice(0, -1);
+                const parent = vizTreeNodes.find(n => n.depth === node.depth - 1 && n.path === parentPath);
+                if (parent) {
+                    const edge = document.getElementById(`tree-link-${parent.id}-${node.id}`);
+                    if (edge) edge.classList.add('active');
+                }
+            }
+        }
 
         function startVisualization() {
             const input = document.getElementById('vizInput').value;
@@ -1771,6 +1978,7 @@ current_subset.<span class="function">pop</span>()  <span class="comment"># Esse
 
             vizSteps = generateVizSteps(nums);
             vizCurrentStep = 0;
+            renderTree(nums);
             
             document.getElementById('stepBtn').disabled = false;
             document.getElementById('resetBtn').disabled = false;
@@ -1834,6 +2042,7 @@ current_subset.<span class="function">pop</span>()  <span class="comment"># Esse
             document.getElementById('currentIndex').textContent = step.index;
             document.getElementById('currentSubset').textContent = `[${step.subset.join(',')}]`;
             document.getElementById('currentAction').textContent = step.action;
+            highlightTreeForStep(step);
             
             const resultsCount = vizSteps.slice(0, vizCurrentStep + 1)
                 .filter(s => s.action.includes('Base case')).length;
@@ -1849,6 +2058,7 @@ current_subset.<span class="function">pop</span>()  <span class="comment"># Esse
             document.getElementById('resultsCount').textContent = '0';
             document.getElementById('stepBtn').disabled = true;
             document.getElementById('resetBtn').disabled = true;
+            document.getElementById('treeViz').innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Enter an array and click Start to visualize</p>';
         }
 
         // Code playground
@@ -1901,14 +2111,13 @@ print(subsets([1, 2, 3]))`;
             document.getElementById('codeOutput').innerHTML = '<div style="color: var(--text-secondary);">Output will appear here...</div>';
         }
 
-        // Smooth scrolling for nav links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        // Keep non-nav in-page anchors smooth if any are added later.
+        document.querySelectorAll('a[href^="#"]:not(.nav-tab-link)').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
-                e.preventDefault();
                 const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
+                if (!target) return;
+                e.preventDefault();
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
         });
     </script>
