@@ -1,0 +1,1721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subsets 1 — Backtracking Learning Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:wght@700;900&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #141825;
+            --bg-tertiary: #1e2433;
+            --accent-primary: #00d4ff;
+            --accent-secondary: #ff006e;
+            --accent-tertiary: #8338ec;
+            --text-primary: #e8eaed;
+            --text-secondary: #9aa0a6;
+            --text-muted: #5f6368;
+            --success: #00ff94;
+            --warning: #ffba08;
+            --danger: #ff006e;
+            --code-bg: #0d1117;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            width: 0%;
+            z-index: 9999;
+            transition: width 0.1s;
+        }
+
+        /* ── Header ── */
+        .problem-header {
+            max-width: 1200px;
+            margin: 1.5rem auto 1rem;
+            padding: 1.75rem 2rem;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(20,24,37,.96), rgba(30,36,51,.92));
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .problem-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: slideDown 1s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-50px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .problem-tagline {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            margin-top: .35rem;
+            animation: fadeIn 1s ease-out .3s backwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        .difficulty-badge {
+            display: inline-block;
+            padding: .5rem 1.5rem;
+            background: rgba(255,186,8,.2);
+            border: 2px solid var(--warning);
+            border-radius: 30px;
+            color: var(--warning);
+            font-weight: 600;
+            animation: fadeIn 1s ease-out .5s backwards;
+        }
+
+        /* ── Nav ── */
+        nav {
+            position: sticky; top: 0;
+            background: rgba(10,14,26,.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-links { display: flex; gap: 1.5rem; list-style: none; flex-wrap: wrap; }
+
+        .nav-tab-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: .9rem;
+            transition: color .3s;
+            position: relative;
+            background: transparent;
+            border: none;
+            padding: 0;
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        .nav-tab-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px; left: 0;
+            width: 0; height: 2px;
+            background: var(--accent-primary);
+            transition: width .3s;
+        }
+
+        .nav-tab-link:hover,
+        .nav-tab-link.active { color: var(--accent-primary); }
+        .nav-tab-link:hover::after,
+        .nav-tab-link.active::after { width: 100%; }
+
+        /* ── Sections ── */
+        .container { max-width: 1200px; margin: 0 auto; padding: 3rem 2rem; }
+
+        .section { display: none; }
+        .section.active-page {
+            display: block;
+            animation: fadeIn .35s ease;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.8rem;
+            margin-bottom: 1.75rem;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-tertiary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* ── Cards ── */
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: transform .3s, box-shadow .3s;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 40px rgba(0,212,255,.18);
+        }
+
+        .card h3 { font-size: 1.25rem; margin-bottom: .75rem; color: var(--accent-primary); }
+        .card h4 { font-size: 1rem; margin: 1.25rem 0 .5rem; color: var(--text-primary); }
+        .card p  { color: var(--text-secondary); }
+
+        /* ── Stats grid ── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+            padding: 1.75rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 4px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-label { color: var(--text-secondary); margin-top: .4rem; font-size: .85rem; }
+
+        /* ── Code blocks ── */
+        .code-block {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .88rem;
+            overflow-x: auto;
+            margin: 1.25rem 0;
+            white-space: pre;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: .75rem;
+            padding-bottom: .5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .code-lang { color: var(--accent-primary); font-weight: 600; font-size: .72rem; text-transform: uppercase; }
+
+        .copy-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: .35rem .9rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .72rem;
+            transition: all .3s;
+        }
+        .copy-btn:hover { background: var(--accent-primary); color: var(--bg-primary); border-color: var(--accent-primary); }
+
+        /* syntax colours */
+        .kw  { color: #ff79c6; }
+        .fn  { color: #50fa7b; }
+        .st  { color: #f1fa8c; }
+        .cm  { color: var(--text-muted); }
+        .nm  { color: #bd93f9; }
+
+        /* ── Alerts ── */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin: 1.25rem 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        .alert-info    { background: rgba(0,212,255,.1);  border: 1px solid var(--accent-primary); color: var(--accent-primary); }
+        .alert-warning { background: rgba(255,186,8,.1);  border: 1px solid var(--warning);        color: var(--warning); }
+        .alert-success { background: rgba(0,255,148,.1);  border: 1px solid var(--success);        color: var(--success); }
+        .alert-danger  { background: rgba(255,0,110,.1);  border: 1px solid var(--danger);         color: var(--danger); }
+
+        /* ── Tabs ── */
+        .tabs {
+            display: flex;
+            gap: .75rem;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 1.75rem;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: .75rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: .95rem;
+            font-weight: 500;
+            transition: all .3s;
+            position: relative;
+            font-family: inherit;
+        }
+        .tab.active { color: var(--accent-primary); }
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px; left: 0;
+            width: 100%; height: 2px;
+            background: var(--accent-primary);
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn .4s; }
+
+        /* ── Step-by-step ── */
+        .steps-list { display: flex; flex-direction: column; gap: 1.5rem; }
+
+        .step {
+            display: flex;
+            gap: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .step:last-child { border-bottom: none; padding-bottom: 0; }
+
+        .step-num {
+            flex-shrink: 0;
+            width: 46px; height: 46px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 1.2rem;
+        }
+
+        .step-body h3 { font-size: 1.05rem; color: var(--accent-primary); margin-bottom: .4rem; }
+        .step-body p  { color: var(--text-secondary); font-size: .95rem; }
+
+        /* ── Grid ── */
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 1.75rem; }
+
+        /* ── Quiz ── */
+        .quiz-block {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.75rem;
+            margin-bottom: 1.75rem;
+        }
+
+        .quiz-q { font-size: 1.1rem; margin-bottom: 1.25rem; }
+
+        .quiz-options { display: flex; flex-direction: column; gap: .75rem; }
+
+        .quiz-opt {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border);
+            padding: .9rem 1.25rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all .25s;
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            font-size: .95rem;
+        }
+        .quiz-opt:hover { border-color: var(--accent-primary); background: rgba(0,212,255,.08); }
+        .quiz-opt.correct  { border-color: var(--success); background: rgba(0,255,148,.12); }
+        .quiz-opt.incorrect{ border-color: var(--danger);  background: rgba(255,0,110,.12); }
+        .quiz-opt.locked   { pointer-events: none; }
+
+        .quiz-feedback {
+            margin-top: 1rem;
+            padding: .85rem 1.1rem;
+            border-radius: 8px;
+            display: none;
+            font-size: .93rem;
+        }
+        .quiz-feedback.show { display: block; animation: slideIn .4s; }
+        .quiz-feedback.correct  { background: rgba(0,255,148,.08);  border: 1px solid var(--success); color: var(--success); }
+        .quiz-feedback.incorrect{ background: rgba(255,0,110,.08);  border: 1px solid var(--danger);  color: var(--danger); }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-16px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+
+        /* ── Btn ── */
+        .btn {
+            padding: .7rem 1.75rem;
+            border: 2px solid var(--accent-primary);
+            background: transparent;
+            color: var(--accent-primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: .95rem;
+            font-family: inherit;
+            transition: all .3s;
+            margin-top: .75rem;
+        }
+        .btn:hover {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0,212,255,.3);
+        }
+        .btn:disabled { opacity: .4; cursor: not-allowed; }
+
+        /* ── Visualizer ── */
+        .viz-wrap {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .viz-controls { display: flex; gap: .75rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+
+        .viz-input {
+            padding: .7rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .9rem;
+            width: 200px;
+        }
+
+        .state-display {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-bottom: 1.25rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: .75rem;
+        }
+
+        .state-item { display: flex; flex-direction: column; gap: .2rem; }
+        .state-label { color: var(--text-secondary); font-size: .8rem; }
+        .state-val   { color: var(--accent-primary); font-family: 'JetBrains Mono', monospace; font-size: .95rem; }
+
+        .tree-container {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ── Playground ── */
+        .editor {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .88rem;
+            min-height: 280px;
+            color: var(--text-primary);
+            resize: vertical;
+            width: 100%;
+        }
+
+        .run-output {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-top: .75rem;
+            min-height: 80px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .88rem;
+            color: var(--text-secondary);
+        }
+
+        /* ── Flashcards ── */
+        .fc-wrap { perspective: 1000px; margin-bottom: 1.5rem; }
+
+        .fc {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            cursor: pointer;
+            min-height: 220px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            transition: transform .6s;
+            transform-style: preserve-3d;
+        }
+
+        .fc:hover { box-shadow: 0 8px 30px rgba(0,212,255,.15); }
+        .fc.flipped { transform: rotateY(180deg); }
+
+        .fc-front, .fc-back {
+            position: absolute;
+            width: 100%; height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backface-visibility: hidden;
+            padding: 2rem;
+            border-radius: 12px;
+            flex-direction: column;
+            gap: .75rem;
+        }
+
+        .fc-back { transform: rotateY(180deg); }
+        .fc-front h3 { font-size: 1.15rem; color: var(--text-primary); }
+        .fc-back  p  { font-size: .95rem;  color: var(--text-secondary); }
+        .fc-hint { font-size: .78rem; color: var(--text-muted); margin-top: .5rem; }
+
+        /* ── Comparison table ── */
+        .cmp-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: .9rem; }
+        .cmp-table th {
+            padding: .85rem 1rem;
+            text-align: left;
+            color: var(--accent-primary);
+            border-bottom: 2px solid var(--border);
+        }
+        .cmp-table td { padding: .85rem 1rem; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+        .cmp-table tr:last-child td { border-bottom: none; }
+        .cmp-table td:first-child { color: var(--text-primary); font-weight: 600; }
+
+        /* ── Mistake pairs ── */
+        .mistake-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: .75rem 0; }
+        @media (max-width: 700px) { .mistake-pair { grid-template-columns: 1fr; } }
+
+        .mistake-wrong  .code-lang { color: var(--danger); }
+        .mistake-right  .code-lang { color: var(--success); }
+
+        /* ── Checklist ── */
+        .checklist { list-style: none; padding: 0; }
+        .checklist li {
+            padding: .6rem 0;
+            display: flex;
+            align-items: flex-start;
+            gap: .75rem;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+            font-size: .95rem;
+        }
+        .checklist li:last-child { border-bottom: none; }
+        .checklist li::before { content: '✓'; color: var(--success); font-weight: 700; flex-shrink: 0; }
+
+        /* ── Dry-run table ── */
+        .dr-table { width: 100%; border-collapse: collapse; font-size: .85rem; overflow-x: auto; display: block; }
+        .dr-table th {
+            padding: .6rem .9rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--accent-primary);
+            white-space: nowrap;
+        }
+        .dr-table td {
+            padding: .55rem .9rem;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            white-space: nowrap;
+        }
+        .dr-table tr:nth-child(even) td { background: rgba(255,255,255,.02); }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .problem-header { flex-direction: column; align-items: flex-start; margin: .75rem; padding: 1.25rem; }
+            .problem-title  { font-size: 2rem; }
+            .section-title  { font-size: 2rem; }
+            .grid-2         { grid-template-columns: 1fr; }
+            .nav-links      { gap: .75rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<header class="problem-header">
+    <div>
+        <h1 class="problem-title">Subsets</h1>
+        <p class="problem-tagline">Generate the power set via backtracking — the gateway pattern for combinatorial search</p>
+    </div>
+    <span class="difficulty-badge">MEDIUM</span>
+</header>
+
+<nav>
+    <div style="font-weight:700;font-size:1.1rem;color:var(--accent-primary);white-space:nowrap;">LC 78</div>
+    <ul class="nav-links">
+        <li><button class="nav-tab-link" data-section="problem">Problem</button></li>
+        <li><button class="nav-tab-link" data-section="concepts">Concepts</button></li>
+        <li><button class="nav-tab-link" data-section="walkthrough">Walkthrough</button></li>
+        <li><button class="nav-tab-link" data-section="visualizer">Visualizer</button></li>
+        <li><button class="nav-tab-link" data-section="quiz">Quiz</button></li>
+        <li><button class="nav-tab-link" data-section="playground">Playground</button></li>
+        <li><button class="nav-tab-link" data-section="alternatives">Alternatives</button></li>
+        <li><button class="nav-tab-link" data-section="mistakes">Mistakes</button></li>
+        <li><button class="nav-tab-link" data-section="flashcards">Flashcards</button></li>
+        <li><button class="nav-tab-link" data-section="reference">Reference</button></li>
+        <li><button class="nav-tab-link" data-section="next-steps">Next Steps</button></li>
+    </ul>
+</nav>
+
+<div class="container">
+
+<!-- ════════════════════════════════ PROBLEM ════════════════════════════════ -->
+<section id="problem" class="section">
+    <h2 class="section-title">Problem Statement</h2>
+
+    <div class="card">
+        <h3>Challenge</h3>
+        <p>Given an array <code style="color:var(--accent-primary)">nums</code> of <strong>unique</strong> integers, return <strong>all possible subsets</strong> (the power set).</p>
+        <ul style="margin:1rem 0 0 1.25rem;color:var(--text-secondary);font-size:.95rem;">
+            <li>Input: array of unique integers.</li>
+            <li>Output: list of all subsets, including the empty subset.</li>
+            <li>No duplicate subsets allowed; order of subsets in the output does not matter.</li>
+        </ul>
+
+        <div class="grid-2" style="margin-top:1.75rem;">
+            <div>
+                <h4>Example 1</h4>
+                <div class="code-block"><div class="code-header"><span class="code-lang">Input / Output</span></div><span class="kw">Input :</span>  nums = [1, 2, 3]
+<span class="kw">Output:</span>  [[], [1], [2], [1,2], [3], [1,3], [2,3], [1,2,3]]
+
+<span class="cm"># Every combination of including / excluding each of
+# the 3 elements produces 2³ = 8 subsets.</span></div>
+            </div>
+            <div>
+                <h4>Example 2</h4>
+                <div class="code-block"><div class="code-header"><span class="code-lang">Input / Output</span></div><span class="kw">Input :</span>  nums = [7]
+<span class="kw">Output:</span>  [[], [7]]
+
+<span class="cm"># The only element can be included or excluded,
+# giving exactly 2 subsets.</span></div>
+            </div>
+        </div>
+
+        <div class="alert alert-info" style="margin-top:1.5rem;">
+            <span style="font-size:1.4rem;flex-shrink:0;">💡</span>
+            <div><strong>Key Insight:</strong> At each index there are exactly two choices — include the element or skip it. Traversing all such binary decisions from left to right produces every possible subset exactly once. For an array of length <em>n</em> this yields 2ⁿ subsets, and copying each subset of average length <em>n</em>/2 gives the <strong>O(n · 2ⁿ)</strong> time bound.</div>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value">O(n·2ⁿ)</div>
+            <div class="stat-label">Time Complexity</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">O(n)</div>
+            <div class="stat-label">Extra Space (stack + buffer)</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">2ⁿ</div>
+            <div class="stat-label">Total Subsets</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">n</div>
+            <div class="stat-label">Max Recursion Depth</div>
+        </div>
+    </div>
+</section>
+
+<!-- ════════════════════════════════ CONCEPTS ════════════════════════════════ -->
+<section id="concepts" class="section">
+    <h2 class="section-title">Core Concepts</h2>
+
+    <div class="tabs">
+        <button class="tab active" data-tab="c-backtracking">Backtracking</button>
+        <button class="tab" data-tab="c-decision">Decision Tree</button>
+        <button class="tab" data-tab="c-when">When to Use</button>
+    </div>
+
+    <div id="c-backtracking" class="tab-content active">
+        <div class="card">
+            <h3>Pattern Definition</h3>
+            <p><strong>Backtracking</strong> is depth-first search over a decision tree where each node represents a partial solution. At each step we make a choice, recurse, then <em>undo</em> that choice (backtrack) before trying the alternative.</p>
+            <p style="margin-top:.75rem;">Here, the decision at every index is <strong>include / skip</strong>. There is no pruning needed because every path to a leaf is valid — every leaf is a complete subset.</p>
+
+            <h4>Core Loop</h4>
+            <ol style="margin-left:1.25rem;color:var(--text-secondary);font-size:.95rem;">
+                <li>Make a choice (include or skip the element)</li>
+                <li>Recurse with the updated state</li>
+                <li>Undo the choice (<code>subset.pop()</code>) — backtrack</li>
+                <li>Try the alternative</li>
+            </ol>
+
+            <div class="alert alert-warning" style="margin-top:1.25rem;">
+                <span style="font-size:1.3rem;flex-shrink:0;">⚠️</span>
+                <div><strong>Important Caveat:</strong> Always append a <em>copy</em> of <code>subset</code>, not the list itself. <code>res.append(subset)</code> stores a reference — backtracking will mutate that reference later, corrupting previously recorded subsets. Use <code>res.append(subset.copy())</code> or <code>res.append(subset[:])</code>.</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="c-decision" class="tab-content">
+        <div class="card">
+            <h3>Decision Process / State View</h3>
+            <p>State at each recursive call: <code>(i, subset)</code> — current index and elements chosen so far.</p>
+
+            <div class="code-block" style="margin-top:1.25rem;"><div class="code-header"><span class="code-lang">Decision Tree — nums = [1, 2, 3]</span></div>dfs(i=0, subset=[])
+├── include nums[0]  →  dfs(i=1, subset=[1])
+│   ├── include nums[1]  →  dfs(i=2, subset=[1,2])
+│   │   ├── include nums[2]  →  dfs(i=3)  → record [1,2,3]
+│   │   └── skip    nums[2]  →  dfs(i=3)  → record [1,2]
+│   └── skip    nums[1]  →  dfs(i=2, subset=[1])
+│       ├── include nums[2]  →  dfs(i=3)  → record [1,3]
+│       └── skip    nums[2]  →  dfs(i=3)  → record [1]
+└── skip    nums[0]  →  dfs(i=1, subset=[])
+    ├── include nums[1]  →  dfs(i=2, subset=[2])
+    │   ├── include nums[2]  →  dfs(i=3)  → record [2,3]
+    │   └── skip    nums[2]  →  dfs(i=3)  → record [2]
+    └── skip    nums[1]  →  dfs(i=2, subset=[])
+        ├── include nums[2]  →  dfs(i=3)  → record [3]
+        └── skip    nums[2]  →  dfs(i=3)  → record []</div>
+
+            <div class="alert alert-info" style="margin-top:1rem;">
+                <span style="font-size:1.2rem;flex-shrink:0;">📊</span>
+                <div>Total tree nodes: 2ⁿ⁺¹ − 1. Leaf nodes (depth = n): exactly 2ⁿ, one per subset.</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="c-when" class="tab-content">
+        <div class="card">
+            <h3>When to Use This Pattern</h3>
+            <h4>Trigger Signals</h4>
+            <ul class="checklist">
+                <li>Problem asks to enumerate <em>all</em> combinations / subsets / permutations.</li>
+                <li>Output size is exponential (2ⁿ, n!, …).</li>
+                <li>Elements are unique and ordering within a subset does not matter.</li>
+                <li>"Generate all…" or "find all possible…" phrasing.</li>
+                <li>Problem involves choosing a subset of items from a set.</li>
+            </ul>
+
+            <h4>Related Problems</h4>
+            <ul class="checklist">
+                <li>Subsets II — duplicates allowed in input (LC 90)</li>
+                <li>Combination Sum (LC 39)</li>
+                <li>Permutations (LC 46)</li>
+                <li>Letter Combinations of a Phone Number (LC 17)</li>
+                <li>Palindrome Partitioning (LC 131)</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- ════════════════════════════════ WALKTHROUGH ════════════════════════════════ -->
+<section id="walkthrough" class="section">
+    <h2 class="section-title">Step-by-Step Walkthrough</h2>
+
+    <div class="card">
+        <div class="steps-list">
+            <div class="step">
+                <div class="step-num">1</div>
+                <div class="step-body">
+                    <h3>Initialize result and buffer</h3>
+                    <div class="code-block"><div class="code-header"><span class="code-lang">Python</span></div>res = []
+subset = []</div>
+                    <p><code>res</code> collects finished subsets; <code>subset</code> is the mutable work buffer.</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-num">2</div>
+                <div class="step-body">
+                    <h3>Define the recursive helper <code>dfs(i)</code></h3>
+                    <div class="code-block"><div class="code-header"><span class="code-lang">Python</span></div><span class="kw">def</span> <span class="fn">dfs</span>(i):</div>
+                    <p><code>i</code> is the index of the element we are currently deciding on.</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-num">3</div>
+                <div class="step-body">
+                    <h3>Base case: index past the array → record the subset</h3>
+                    <div class="code-block"><div class="code-header"><span class="code-lang">Python</span></div>    <span class="kw">if</span> i >= <span class="fn">len</span>(nums):
+        res.<span class="fn">append</span>(subset.<span class="fn">copy</span>())
+        <span class="kw">return</span></div>
+                    <p>Every path through the tree is valid, so we record at every leaf. <strong>Copy</strong> is essential.</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-num">4</div>
+                <div class="step-body">
+                    <h3>Branch 1 — include <code>nums[i]</code></h3>
+                    <div class="code-block"><div class="code-header"><span class="code-lang">Python</span></div>    subset.<span class="fn">append</span>(nums[i])
+    <span class="fn">dfs</span>(i + <span class="nm">1</span>)</div>
+                    <p>Add the current element and recurse on the remaining elements.</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-num">5</div>
+                <div class="step-body">
+                    <h3>Backtrack — remove <code>nums[i]</code></h3>
+                    <div class="code-block"><div class="code-header"><span class="code-lang">Python</span></div>    subset.<span class="fn">pop</span>()</div>
+                    <p>Undo the inclusion so we can explore the exclusion branch with a clean state.</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-num">6</div>
+                <div class="step-body">
+                    <h3>Branch 2 — skip <code>nums[i]</code></h3>
+                    <div class="code-block"><div class="code-header"><span class="code-lang">Python</span></div>    <span class="fn">dfs</span>(i + <span class="nm">1</span>)</div>
+                    <p>Recurse without touching <code>subset</code>, representing exclusion of this element.</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-num">7</div>
+                <div class="step-body">
+                    <h3>Kick off the recursion</h3>
+                    <div class="code-block"><div class="code-header"><span class="code-lang">Python</span></div><span class="fn">dfs</span>(<span class="nm">0</span>)</div>
+                    <p>Start from index 0 with an empty subset.</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-num">8</div>
+                <div class="step-body">
+                    <h3>Return the accumulated result</h3>
+                    <div class="code-block"><div class="code-header"><span class="code-lang">Python</span></div><span class="kw">return</span> res</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Complete Solution -->
+    <div class="card">
+        <h3>Complete Solution (Primary)</h3>
+        <div class="code-block">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div><span class="kw">from</span> typing <span class="kw">import</span> List
+
+<span class="kw">class</span> <span class="fn">Solution</span>:
+    <span class="kw">def</span> <span class="fn">subsets</span>(self, nums: List[int]) -> List[List[int]]:
+        res = []
+        subset = []
+
+        <span class="kw">def</span> <span class="fn">dfs</span>(i):
+            <span class="kw">if</span> i >= <span class="fn">len</span>(nums):
+                res.<span class="fn">append</span>(subset.<span class="fn">copy</span>())
+                <span class="kw">return</span>
+            subset.<span class="fn">append</span>(nums[i])
+            <span class="fn">dfs</span>(i + <span class="nm">1</span>)
+            subset.<span class="fn">pop</span>()
+            <span class="fn">dfs</span>(i + <span class="nm">1</span>)
+
+        <span class="fn">dfs</span>(<span class="nm">0</span>)
+        <span class="kw">return</span> res</div>
+    </div>
+
+    <!-- Dry Run -->
+    <div class="card">
+        <h3>Dry Run — nums = [1, 2, 3]</h3>
+        <div style="overflow-x:auto;margin-top:1rem;">
+            <table class="dr-table">
+                <thead>
+                    <tr>
+                        <th>Call</th>
+                        <th>Action</th>
+                        <th>subset after</th>
+                        <th>res after</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>dfs(0)</td><td>include 1</td><td>[1]</td><td>—</td></tr>
+                    <tr><td>dfs(1)</td><td>include 2</td><td>[1, 2]</td><td>—</td></tr>
+                    <tr><td>dfs(2)</td><td>include 3</td><td>[1, 2, 3]</td><td>—</td></tr>
+                    <tr><td>dfs(3)</td><td>base case → copy</td><td>[1, 2, 3]</td><td>[[1,2,3]]</td></tr>
+                    <tr><td>back to dfs(2)</td><td>pop 3 (backtrack)</td><td>[1, 2]</td><td>—</td></tr>
+                    <tr><td>dfs(3)</td><td>base case → copy</td><td>[1, 2]</td><td>[[1,2,3],[1,2]]</td></tr>
+                    <tr><td>back to dfs(1)</td><td>pop 2 (backtrack)</td><td>[1]</td><td>—</td></tr>
+                    <tr><td>dfs(2)</td><td>include 3</td><td>[1, 3]</td><td>—</td></tr>
+                    <tr><td>dfs(3)</td><td>base case → copy</td><td>[1, 3]</td><td>[...,[1,3]]</td></tr>
+                    <tr><td>back to dfs(2)</td><td>pop 3 (backtrack)</td><td>[1]</td><td>—</td></tr>
+                    <tr><td>dfs(3)</td><td>base case → copy</td><td>[1]</td><td>[...,[1]]</td></tr>
+                    <tr><td>back to dfs(0)</td><td>pop 1 (backtrack)</td><td>[]</td><td>—</td></tr>
+                    <tr><td>dfs(1)</td><td>include 2</td><td>[2]</td><td>—</td></tr>
+                    <tr><td>…</td><td>(symmetric)</td><td>…</td><td>[...,[2,3],[2]]</td></tr>
+                    <tr><td>dfs(2)</td><td>include 3 → dfs(3)</td><td>[3]</td><td>[...,[3]]</td></tr>
+                    <tr><td>dfs(3)</td><td>base case → copy</td><td>[]</td><td>[...,[]]</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p style="margin-top:1rem;font-family:'JetBrains Mono',monospace;font-size:.88rem;color:var(--success);">Final res: [[1,2,3],[1,2],[1,3],[1],[2,3],[2],[3],[]]</p>
+    </div>
+</section>
+
+<!-- ════════════════════════════════ VISUALIZER ════════════════════════════════ -->
+<section id="visualizer" class="section">
+    <h2 class="section-title">Interactive Visualizer</h2>
+
+    <div class="viz-wrap">
+        <div class="viz-controls">
+            <input class="viz-input" id="vizInput" type="text" value="1,2,3" placeholder="e.g. 1,2,3">
+            <button class="btn" onclick="startViz()" style="margin-top:0;">Start</button>
+            <button class="btn" id="stepBtn" onclick="stepViz()" disabled style="margin-top:0;">Next Step</button>
+            <button class="btn" id="resetBtn" onclick="resetViz()" disabled style="margin-top:0;">Reset</button>
+        </div>
+
+        <div class="state-display">
+            <div class="state-item"><span class="state-label">Current Index (i)</span><span class="state-val" id="stI">—</span></div>
+            <div class="state-item"><span class="state-label">subset</span><span class="state-val" id="stSubset">[]</span></div>
+            <div class="state-item"><span class="state-label">Action</span><span class="state-val" id="stAction">—</span></div>
+            <div class="state-item"><span class="state-label">res count</span><span class="state-val" id="stRes">0</span></div>
+        </div>
+
+        <div class="tree-container" id="treeViz">
+            <p style="color:var(--text-secondary);">Enter an array and click Start to visualize.</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Visualizer Spec</h3>
+        <h4>State Fields Tracked</h4>
+        <ul class="checklist">
+            <li><code>i</code> — current index being decided (0-based).</li>
+            <li><code>subset</code> — current partial subset (list of integers).</li>
+            <li><code>action</code> — most recent operation (include / skip / backtrack / record).</li>
+            <li><code>res_count</code> — number of subsets recorded so far.</li>
+        </ul>
+        <h4>Step Events</h4>
+        <ul class="checklist">
+            <li><strong>include</strong> — Branch 1: append nums[i]; subset grows by 1; i advances by 1.</li>
+            <li><strong>backtrack</strong> — After include branch: subset shrinks by 1 (pop).</li>
+            <li><strong>skip</strong> — Branch 2: subset unchanged; i advances by 1.</li>
+            <li><strong>record</strong> — Base case: copy of subset appended to res; res_count += 1.</li>
+        </ul>
+    </div>
+</section>
+
+<!-- ════════════════════════════════ QUIZ ════════════════════════════════ -->
+<section id="quiz" class="section">
+    <h2 class="section-title">Knowledge Check</h2>
+
+    <!-- Q1 -->
+    <div class="quiz-block" id="qb1">
+        <p class="quiz-q"><strong>Q1 — Complexity:</strong> What is the time complexity of the backtracking solution?</p>
+        <div class="quiz-options">
+            <div class="quiz-opt" onclick="checkQ(1,'A',false,this)"><strong>A)</strong> O(n²)</div>
+            <div class="quiz-opt" onclick="checkQ(1,'B',false,this)"><strong>B)</strong> O(2ⁿ)</div>
+            <div class="quiz-opt" onclick="checkQ(1,'C',true,this)"><strong>C)</strong> O(n · 2ⁿ)</div>
+            <div class="quiz-opt" onclick="checkQ(1,'D',false,this)"><strong>D)</strong> O(n log n)</div>
+        </div>
+        <div class="quiz-feedback" id="qf1">
+            <strong>Answer: C</strong> — There are 2ⁿ leaf nodes (subsets). At each leaf we copy <code>subset</code>, which takes O(n) worst case. Multiplying gives O(n · 2ⁿ).
+        </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="quiz-block" id="qb2">
+        <p class="quiz-q"><strong>Q2 — Correctness Invariant:</strong> Which invariant guarantees no duplicate subsets are generated?</p>
+        <div class="quiz-options">
+            <div class="quiz-opt" onclick="checkQ(2,'A',false,this)"><strong>A)</strong> We sort <code>nums</code> before recursing.</div>
+            <div class="quiz-opt" onclick="checkQ(2,'B',true,this)"><strong>B)</strong> We always recurse left-to-right (i → i+1), never revisiting earlier indices.</div>
+            <div class="quiz-opt" onclick="checkQ(2,'C',false,this)"><strong>C)</strong> We use a set to de-duplicate results.</div>
+            <div class="quiz-opt" onclick="checkQ(2,'D',false,this)"><strong>D)</strong> We prune branches when the current element has been seen before.</div>
+        </div>
+        <div class="quiz-feedback" id="qf2">
+            <strong>Answer: B</strong> — Because we only advance the index forward (<code>dfs(i+1)</code>), each element is decided at most once per path, preventing duplicates.
+        </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="quiz-block" id="qb3">
+        <p class="quiz-q"><strong>Q3 — Edge Case:</strong> What does the algorithm return for <code>nums = []</code>?</p>
+        <div class="quiz-options">
+            <div class="quiz-opt" onclick="checkQ(3,'A',false,this)"><strong>A)</strong> <code>None</code></div>
+            <div class="quiz-opt" onclick="checkQ(3,'B',false,this)"><strong>B)</strong> <code>[]</code></div>
+            <div class="quiz-opt" onclick="checkQ(3,'C',true,this)"><strong>C)</strong> <code>[[]]</code></div>
+            <div class="quiz-opt" onclick="checkQ(3,'D',false,this)"><strong>D)</strong> Raises an IndexError</div>
+        </div>
+        <div class="quiz-feedback" id="qf3">
+            <strong>Answer: C</strong> — <code>dfs(0)</code> is called and immediately hits the base case <code>i >= len(nums)</code> (0 ≥ 0), recording a copy of the empty <code>subset</code> — giving <code>[[]]</code>.
+        </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="quiz-block" id="qb4">
+        <p class="quiz-q"><strong>Q4 — Implementation Pitfall:</strong> Why is <code>res.append(subset)</code> wrong in the base case?</p>
+        <div class="quiz-options">
+            <div class="quiz-opt" onclick="checkQ(4,'A',false,this)"><strong>A)</strong> <code>subset</code> is a tuple and cannot be appended to a list.</div>
+            <div class="quiz-opt" onclick="checkQ(4,'B',true,this)"><strong>B)</strong> It stores a reference; later <code>pop()</code> calls mutate the stored object.</div>
+            <div class="quiz-opt" onclick="checkQ(4,'C',false,this)"><strong>C)</strong> It skips the empty subset.</div>
+            <div class="quiz-opt" onclick="checkQ(4,'D',false,this)"><strong>D)</strong> It causes infinite recursion.</div>
+        </div>
+        <div class="quiz-feedback" id="qf4">
+            <strong>Answer: B</strong> — <code>subset</code> is a mutable list. Appending it directly stores a reference. Every subsequent <code>subset.pop()</code> during backtracking modifies the same object already in <code>res</code>, corrupting results. Use <code>subset.copy()</code>.
+        </div>
+    </div>
+
+    <div class="alert alert-success" id="quizDone" style="display:none;">
+        <span style="font-size:1.3rem;flex-shrink:0;">🎉</span>
+        <div><strong>All 4 questions answered!</strong> Review any you missed, then head to the Playground.</div>
+    </div>
+</section>
+
+<!-- ════════════════════════════════ PLAYGROUND ════════════════════════════════ -->
+<section id="playground" class="section">
+    <h2 class="section-title">Code Playground</h2>
+
+    <div class="card">
+        <h3>Starter Code</h3>
+        <p style="margin-bottom:1rem;">Fill in the TODOs, then click <strong>Run</strong> to check against the expected output.</p>
+        <textarea class="editor" id="codeEditor">from typing import List
+
+class Solution:
+    def subsets(self, nums: List[int]) -> List[List[int]]:
+        res = []
+        subset = []
+
+        def dfs(i):
+            # TODO: add base case
+
+            # TODO: include branch
+
+            # TODO: backtrack
+
+            # TODO: skip branch
+            pass
+
+        dfs(0)
+        return res
+
+# Default test
+sol = Solution()
+print(sol.subsets([1, 2, 3]))
+# Expected: [[], [1], [2], [1,2], [3], [1,3], [2,3], [1,2,3]]</textarea>
+        <div style="display:flex;gap:.75rem;margin-top:.75rem;flex-wrap:wrap;">
+            <button class="btn" onclick="runCode()" style="margin-top:0;">Run</button>
+            <button class="btn" onclick="resetCode()" style="margin-top:0;">Reset</button>
+            <button class="btn" onclick="showSolution()" style="margin-top:0;border-color:var(--accent-tertiary);color:var(--accent-tertiary);">Show Solution</button>
+        </div>
+        <div class="run-output" id="runOutput">Output will appear here…</div>
+    </div>
+
+    <div class="card">
+        <h3>Suggested Experiments</h3>
+        <div class="steps-list">
+            <div class="step">
+                <div class="step-num">1</div>
+                <div class="step-body">
+                    <h3>Constraint variant — subsets of exactly size k</h3>
+                    <p>Modify <code>dfs</code> to only record <code>subset</code> when <code>len(subset) == k</code>. What is the new time complexity?</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <div class="step-body">
+                    <h3>Alternative paradigm — iterative building</h3>
+                    <p>Replace <code>dfs</code> with a loop: start with <code>res = [[]]</code> and for each <code>num</code> in <code>nums</code>, extend <code>res</code> with <code>[s + [num] for s in res]</code>. Verify both produce the same output.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <div class="step-body">
+                    <h3>Optimization / proof — bitmask approach</h3>
+                    <p>For <em>n</em> elements, the integers 0 through 2ⁿ−1 each correspond to exactly one subset via their binary representation. Implement this, then prove that every subset is generated exactly once.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ════════════════════════════════ ALTERNATIVES ════════════════════════════════ -->
+<section id="alternatives" class="section">
+    <h2 class="section-title">Alternative Approaches</h2>
+
+    <div class="tabs">
+        <button class="tab active" data-tab="alt-iter">Iterative</button>
+        <button class="tab" data-tab="alt-bit">Bit Manipulation</button>
+        <button class="tab" data-tab="alt-cmp">Comparison</button>
+    </div>
+
+    <div id="alt-iter" class="tab-content active">
+        <div class="card">
+            <h3>Alternative 1: Iterative Building</h3>
+            <p><strong>Intuition:</strong> Start with <code>[[]]</code>. For each number, duplicate every existing subset and append the number to each duplicate. This doubles the list with each element.</p>
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-lang">Python</span>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div><span class="kw">from</span> typing <span class="kw">import</span> List
+
+<span class="kw">class</span> <span class="fn">Solution</span>:
+    <span class="kw">def</span> <span class="fn">subsets</span>(self, nums: List[int]) -> List[List[int]]:
+        res = [[]]
+
+        <span class="kw">for</span> num <span class="kw">in</span> nums:
+            res += [subset + [num] <span class="kw">for</span> subset <span class="kw">in</span> res]
+
+        <span class="kw">return</span> res</div>
+            <ul style="margin:1rem 0 0 1.25rem;color:var(--text-secondary);font-size:.9rem;">
+                <li>Time: O(n · 2ⁿ)</li>
+                <li>Space: O(n) extra; O(2ⁿ) for output.</li>
+                <li><strong>When to prefer:</strong> Avoids recursion overhead; useful when stack depth is a concern.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="alt-bit" class="tab-content">
+        <div class="card">
+            <h3>Alternative 2: Bit Manipulation</h3>
+            <p><strong>Intuition:</strong> There are 2ⁿ integers from 0 to 2ⁿ−1. Each bit <em>j</em> of integer <em>i</em> encodes whether <code>nums[j]</code> is included in the subset for mask <em>i</em>.</p>
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-lang">Python</span>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div><span class="kw">from</span> typing <span class="kw">import</span> List
+
+<span class="kw">class</span> <span class="fn">Solution</span>:
+    <span class="kw">def</span> <span class="fn">subsets</span>(self, nums: List[int]) -> List[List[int]]:
+        n = <span class="fn">len</span>(nums)
+        res = []
+        <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span> << n):
+            subset = [nums[j] <span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(n) <span class="kw">if</span> (i & (<span class="nm">1</span> << j))]
+            res.<span class="fn">append</span>(subset)
+        <span class="kw">return</span> res</div>
+            <ul style="margin:1rem 0 0 1.25rem;color:var(--text-secondary);font-size:.9rem;">
+                <li>Time: O(n · 2ⁿ)</li>
+                <li>Space: O(n) extra; O(2ⁿ) for output.</li>
+                <li><strong>When to prefer:</strong> Elegant one-liner logic; shows binary intuition. Note: limited to ~30 elements in C/Java due to integer overflow.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="alt-cmp" class="tab-content">
+        <div class="card">
+            <h3>Comparison Table</h3>
+            <table class="cmp-table">
+                <thead>
+                    <tr>
+                        <th>Approach</th>
+                        <th>Pros</th>
+                        <th>Cons</th>
+                        <th>Time</th>
+                        <th>Space</th>
+                        <th>Best Use Case</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Backtracking</td>
+                        <td>General; extends to pruned search</td>
+                        <td>Recursion overhead; .copy() easy to forget</td>
+                        <td>O(n·2ⁿ)</td>
+                        <td>O(n)</td>
+                        <td>Base pattern; extends to Subsets II</td>
+                    </tr>
+                    <tr>
+                        <td>Iterative</td>
+                        <td>No recursion; simple loop</td>
+                        <td>Less intuitive for pruning variants</td>
+                        <td>O(n·2ⁿ)</td>
+                        <td>O(n)</td>
+                        <td>Stack-depth concerns</td>
+                    </tr>
+                    <tr>
+                        <td>Bit Manipulation</td>
+                        <td>Compact; shows binary intuition</td>
+                        <td>Hard to extend to duplicates/pruning</td>
+                        <td>O(n·2ⁿ)</td>
+                        <td>O(n)</td>
+                        <td>Demonstrating alternative thinking</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- ════════════════════════════════ MISTAKES ════════════════════════════════ -->
+<section id="mistakes" class="section">
+    <h2 class="section-title">Common Mistakes</h2>
+
+    <div class="card">
+        <h3 style="color:var(--danger);">Mistake 1: Appending a reference instead of a copy</h3>
+        <div class="mistake-pair">
+            <div class="mistake-wrong">
+                <div class="code-block"><div class="code-header"><span class="code-lang">Wrong</span></div><span class="kw">if</span> i >= <span class="fn">len</span>(nums):
+    res.<span class="fn">append</span>(subset)   <span class="cm"># stores reference</span>
+    <span class="kw">return</span></div>
+            </div>
+            <div class="mistake-right">
+                <div class="code-block"><div class="code-header"><span class="code-lang">Correct</span></div><span class="kw">if</span> i >= <span class="fn">len</span>(nums):
+    res.<span class="fn">append</span>(subset.<span class="fn">copy</span>())  <span class="cm"># snapshot</span>
+    <span class="kw">return</span></div>
+            </div>
+        </div>
+        <p><strong>Why it fails:</strong> <code>subset</code> is mutated by every <code>pop()</code> during backtracking. All entries in <code>res</code> that point to the same object get corrupted.</p>
+        <p><strong>Quick check:</strong> After the call, print each element of <code>res</code> and verify they are distinct objects with <code>id()</code>.</p>
+    </div>
+
+    <div class="card">
+        <h3 style="color:var(--danger);">Mistake 2: Forgetting the empty subset in the iterative approach</h3>
+        <div class="mistake-pair">
+            <div class="mistake-wrong">
+                <div class="code-block"><div class="code-header"><span class="code-lang">Wrong</span></div>res = []   <span class="cm"># missing the seed</span>
+<span class="kw">for</span> num <span class="kw">in</span> nums:
+    res += [subset + [num] <span class="kw">for</span> subset <span class="kw">in</span> res]</div>
+            </div>
+            <div class="mistake-right">
+                <div class="code-block"><div class="code-header"><span class="code-lang">Correct</span></div>res = [[]]  <span class="cm"># seed with empty subset</span>
+<span class="kw">for</span> num <span class="kw">in</span> nums:
+    res += [subset + [num] <span class="kw">for</span> subset <span class="kw">in</span> res]</div>
+            </div>
+        </div>
+        <p><strong>Why it fails:</strong> Without <code>[[]]</code> as the seed, the first iteration produces nothing and all subsequent iterations remain empty.</p>
+        <p><strong>Quick check:</strong> Confirm <code>[]</code> appears in the final output.</p>
+    </div>
+
+    <div class="card">
+        <h3 style="color:var(--danger);">Mistake 3: Re-using the current index instead of advancing</h3>
+        <div class="mistake-pair">
+            <div class="mistake-wrong">
+                <div class="code-block"><div class="code-header"><span class="code-lang">Wrong</span></div><span class="kw">def</span> <span class="fn">dfs</span>(i):
+    ...
+    <span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(i, <span class="fn">len</span>(nums)):
+        subset.<span class="fn">append</span>(nums[j])
+        <span class="fn">dfs</span>(j)          <span class="cm"># passes j, not j+1</span>
+        subset.<span class="fn">pop</span>()</div>
+            </div>
+            <div class="mistake-right">
+                <div class="code-block"><div class="code-header"><span class="code-lang">Correct</span></div><span class="kw">def</span> <span class="fn">dfs</span>(i):
+    ...
+    subset.<span class="fn">append</span>(nums[i])
+    <span class="fn">dfs</span>(i + <span class="nm">1</span>)       <span class="cm"># advance by 1</span>
+    subset.<span class="fn">pop</span>()
+    <span class="fn">dfs</span>(i + <span class="nm">1</span>)</div>
+            </div>
+        </div>
+        <p><strong>Why it fails:</strong> Passing <code>j</code> instead of <code>j+1</code> allows the same index to be picked again, generating duplicates like <code>[1,1]</code>.</p>
+        <p><strong>Quick check:</strong> Verify no subset has repeated elements when the input has no duplicates.</p>
+    </div>
+
+    <div class="card">
+        <h3 style="color:var(--danger);">Mistake 4: Integer overflow in bitmask for large n</h3>
+        <div class="mistake-pair">
+            <div class="mistake-wrong">
+                <div class="code-block"><div class="code-header"><span class="code-lang">Wrong (C/Java)</span></div><span class="cm">// 1 << 31 overflows 32-bit int</span>
+<span class="kw">for</span> (int i = <span class="nm">0</span>; i < (<span class="nm">1</span> << n); i++)</div>
+            </div>
+            <div class="mistake-right">
+                <div class="code-block"><div class="code-header"><span class="code-lang">Correct (C/Java)</span></div><span class="cm">// use long or 1LL when n > 30</span>
+<span class="kw">for</span> (long i = <span class="nm">0</span>; i < (<span class="nm">1L</span> << n); i++)</div>
+            </div>
+        </div>
+        <p><strong>Why it fails:</strong> In statically-typed languages <code>1 &lt;&lt; 31</code> overflows a 32-bit int. Python is exempt (arbitrary-precision ints), but the mistake surfaces when translating code.</p>
+        <p><strong>Quick check:</strong> Confirm <em>n</em> satisfies problem constraints (here n ≤ 10, so no risk in Python).</p>
+    </div>
+</section>
+
+<!-- ════════════════════════════════ FLASHCARDS ════════════════════════════════ -->
+<section id="flashcards" class="section">
+    <h2 class="section-title">Flashcards</h2>
+    <p style="color:var(--text-secondary);margin-bottom:1.5rem;">Click each card to reveal the answer.</p>
+
+    <div class="fc-wrap">
+        <div class="fc" onclick="this.classList.toggle('flipped')">
+            <div class="fc-front">
+                <h3>What is the base case for the backtracking solution to Subsets?</h3>
+                <p class="fc-hint">(click to flip)</p>
+            </div>
+            <div class="fc-back">
+                <p>When <code>i &gt;= len(nums)</code> — we have made a decision for every element, so we append a <strong>copy</strong> of <code>subset</code> to <code>res</code> and return.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="fc-wrap">
+        <div class="fc" onclick="this.classList.toggle('flipped')">
+            <div class="fc-front">
+                <h3>Why is the time complexity O(n · 2ⁿ) and not just O(2ⁿ)?</h3>
+                <p class="fc-hint">(click to flip)</p>
+            </div>
+            <div class="fc-back">
+                <p>There are 2ⁿ subsets (leaves in the decision tree). Recording each one requires <strong>copying</strong> <code>subset</code>, which takes O(n) time worst case. The copy cost gives the extra factor of n.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="fc-wrap">
+        <div class="fc" onclick="this.classList.toggle('flipped')">
+            <div class="fc-front">
+                <h3>What is the core backtracking pattern for subset generation?</h3>
+                <p class="fc-hint">(click to flip)</p>
+            </div>
+            <div class="fc-back">
+                <p><strong>Include</strong> the element → recurse → <strong>pop</strong> (backtrack) → recurse again <strong>without</strong> the element. Two recursive calls per index, advancing <code>i</code> by 1 each time, covering all 2ⁿ combinations.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ════════════════════════════════ REFERENCE ════════════════════════════════ -->
+<section id="reference" class="section">
+    <h2 class="section-title">Quick Reference</h2>
+
+    <div class="card">
+        <h3>Template Code</h3>
+        <div class="code-block">
+            <div class="code-header">
+                <span class="code-lang">Python Template</span>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div><span class="kw">from</span> typing <span class="kw">import</span> List
+
+<span class="kw">class</span> <span class="fn">Solution</span>:
+    <span class="kw">def</span> <span class="fn">subsets</span>(self, nums: List[int]) -> List[List[int]]:
+        res = []
+        subset = []
+
+        <span class="kw">def</span> <span class="fn">dfs</span>(i):
+            <span class="kw">if</span> i >= <span class="fn">len</span>(nums):
+                res.<span class="fn">append</span>(subset.<span class="fn">copy</span>())
+                <span class="kw">return</span>
+            subset.<span class="fn">append</span>(nums[i])
+            <span class="fn">dfs</span>(i + <span class="nm">1</span>)
+            subset.<span class="fn">pop</span>()
+            <span class="fn">dfs</span>(i + <span class="nm">1</span>)
+
+        <span class="fn">dfs</span>(<span class="nm">0</span>)
+        <span class="kw">return</span> res</div>
+    </div>
+
+    <div class="card">
+        <h3>Pattern Mnemonic</h3>
+        <p style="font-family:'JetBrains Mono',monospace;font-size:.95rem;color:var(--accent-primary);line-height:2;">
+            Initialize res/subset → Define dfs(i) → Base case: record copy → Include + Recurse → Backtrack (pop) → Skip + Recurse → Start dfs(0) → Return res
+        </p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value">2</div>
+            <div class="stat-label">Decisions per index (include / skip)</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">2ⁿ</div>
+            <div class="stat-label">Dominant growth (subsets)</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">O(n)</div>
+            <div class="stat-label">Max recursion depth</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">subset</div>
+            <div class="stat-label">Memory driver (buffer of depth n)</div>
+        </div>
+    </div>
+</section>
+
+<!-- ════════════════════════════════ NEXT STEPS ════════════════════════════════ -->
+<section id="next-steps" class="section">
+    <h2 class="section-title">Next Steps</h2>
+
+    <div class="grid-2">
+        <div class="card">
+            <h3>Next Challenges</h3>
+            <ol style="margin-left:1.25rem;color:var(--text-secondary);line-height:2.1;font-size:.95rem;">
+                <li><strong>Subsets II</strong> (Medium, LC 90) — same problem but <code>nums</code> may contain duplicates; requires sorting and skip-duplicate logic.</li>
+                <li><strong>Combination Sum</strong> (Medium, LC 39) — generate subsets that sum to a target; adds pruning to the backtracking.</li>
+                <li><strong>Permutations</strong> (Medium, LC 46) — generate all orderings; decision at each step is which unused element to place next.</li>
+                <li><strong>Palindrome Partitioning</strong> (Medium, LC 131) — partition a string into palindromic substrings; backtracking with a validity check at each branch.</li>
+            </ol>
+        </div>
+
+        <div class="card">
+            <h3>Study Tips</h3>
+            <ul class="checklist">
+                <li><strong>Code from memory first:</strong> Close this guide and re-implement <code>subsets</code> using only the mnemonic. Check correctness against the dry run.</li>
+                <li><strong>Draw the decision tree:</strong> For <code>nums = [1, 2]</code>, sketch the full tree on paper. Label each edge include/skip and each leaf with its subset.</li>
+                <li><strong>Spaced repetition:</strong> Review today, then again in 1 day, 3 days, 7 days, and 14 days. At each session, implement from scratch before re-reading.</li>
+                <li><strong>Extend the template:</strong> After mastering the base version, solve Subsets II — this forces you to understand where duplicate-skipping logic slots in.</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+</div><!-- /container -->
+
+<script>
+// ── Section navigation ──────────────────────────────────────────────────────
+const allSections = Array.from(document.querySelectorAll('.container > .section'));
+const navButtons  = Array.from(document.querySelectorAll('.nav-tab-link'));
+const sectionIds  = new Set(allSections.map(s => s.id));
+
+function showSection(id) {
+    if (!sectionIds.has(id)) return;
+    allSections.forEach(s => s.classList.toggle('active-page', s.id === id));
+    navButtons.forEach(b  => b.classList.toggle('active', b.dataset.section === id));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+navButtons.forEach(b => {
+    b.addEventListener('click', () => {
+        showSection(b.dataset.section);
+        history.replaceState(null, '', `#${b.dataset.section}`);
+    });
+});
+
+// initial section
+(function init() {
+    const hash = location.hash.replace('#', '');
+    showSection(sectionIds.has(hash) ? hash : (navButtons[0]?.dataset.section || 'problem'));
+})();
+
+window.addEventListener('hashchange', () => {
+    const id = location.hash.replace('#', '');
+    if (sectionIds.has(id)) showSection(id);
+});
+
+// ── Inner tabs ───────────────────────────────────────────────────────────────
+document.querySelectorAll('.tabs').forEach(tabBar => {
+    tabBar.addEventListener('click', e => {
+        const btn = e.target.closest('.tab');
+        if (!btn) return;
+        const tabId = btn.dataset.tab;
+        const section = btn.closest('.section');
+
+        tabBar.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+
+        section.querySelectorAll('.tab-content').forEach(tc => {
+            tc.classList.toggle('active', tc.id === tabId);
+        });
+    });
+});
+
+// ── Progress bar ─────────────────────────────────────────────────────────────
+window.addEventListener('scroll', () => {
+    const h = document.documentElement;
+    const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+    document.getElementById('progressBar').style.width = pct + '%';
+});
+
+// ── Quiz ─────────────────────────────────────────────────────────────────────
+const answered = {};
+let answeredCount = 0;
+
+function checkQ(qNum, letter, correct, el) {
+    if (answered[qNum]) return;
+    answered[qNum] = true;
+    answeredCount++;
+
+    const block = document.getElementById(`qb${qNum}`);
+    block.querySelectorAll('.quiz-opt').forEach(o => o.classList.add('locked'));
+
+    el.classList.add(correct ? 'correct' : 'incorrect');
+
+    if (!correct) {
+        // highlight the correct option
+        block.querySelectorAll('.quiz-opt').forEach(o => {
+            if (o.getAttribute('onclick').includes('true')) o.classList.add('correct');
+        });
+    }
+
+    const fb = document.getElementById(`qf${qNum}`);
+    fb.classList.add('show', correct ? 'correct' : 'incorrect');
+
+    if (answeredCount === 4) {
+        document.getElementById('quizDone').style.display = 'flex';
+    }
+}
+
+// ── Copy code ─────────────────────────────────────────────────────────────────
+function copyCode(btn) {
+    const block = btn.closest('.code-block');
+    const pre   = block.querySelector('pre') || block;
+    // strip HTML tags to get plain text
+    const tmp = document.createElement('div');
+    tmp.innerHTML = pre.innerHTML;
+    const text = tmp.textContent;
+    navigator.clipboard.writeText(text);
+    btn.textContent = 'Copied!';
+    btn.style.background = 'var(--success)';
+    btn.style.color = 'var(--bg-primary)';
+    setTimeout(() => {
+        btn.textContent = 'Copy';
+        btn.style.background = '';
+        btn.style.color = '';
+    }, 2000);
+}
+
+// ── Playground ───────────────────────────────────────────────────────────────
+const STARTER = `from typing import List
+
+class Solution:
+    def subsets(self, nums: List[int]) -> List[List[int]]:
+        res = []
+        subset = []
+
+        def dfs(i):
+            # TODO: add base case
+
+            # TODO: include branch
+
+            # TODO: backtrack
+
+            # TODO: skip branch
+            pass
+
+        dfs(0)
+        return res
+
+# Default test
+sol = Solution()
+print(sol.subsets([1, 2, 3]))
+# Expected: [[], [1], [2], [1,2], [3], [1,3], [2,3], [1,2,3]]`;
+
+const SOLUTION = `from typing import List
+
+class Solution:
+    def subsets(self, nums: List[int]) -> List[List[int]]:
+        res = []
+        subset = []
+
+        def dfs(i):
+            if i >= len(nums):
+                res.append(subset.copy())
+                return
+            subset.append(nums[i])
+            dfs(i + 1)
+            subset.pop()
+            dfs(i + 1)
+
+        dfs(0)
+        return res
+
+# Default test
+sol = Solution()
+print(sol.subsets([1, 2, 3]))
+# Expected: [[], [1], [2], [1,2], [3], [1,3], [2,3], [1,2,3]]`;
+
+function runCode() {
+    const code = document.getElementById('codeEditor').value;
+    const out  = document.getElementById('runOutput');
+    out.style.color = 'var(--text-secondary)';
+    out.textContent = 'Simulating…';
+
+    setTimeout(() => {
+        if (code.includes('subset.copy()') && code.includes('dfs(i + 1)') && code.includes('subset.pop()')) {
+            out.style.color = 'var(--success)';
+            out.textContent = '✓ Output:\n[[1, 2, 3], [1, 2], [1, 3], [1], [2, 3], [2], [3], []]';
+        } else if (code.includes('TODO')) {
+            out.style.color = 'var(--warning)';
+            out.textContent = '⚠ TODOs not filled in yet. Complete the implementation first!';
+        } else {
+            out.style.color = 'var(--warning)';
+            out.textContent = '⚠ Implementation looks incomplete or incorrect. Check the walkthrough section.';
+        }
+    }, 400);
+}
+
+function resetCode()    { document.getElementById('codeEditor').value = STARTER;   document.getElementById('runOutput').textContent = 'Output will appear here…'; document.getElementById('runOutput').style.color = ''; }
+function showSolution() { document.getElementById('codeEditor').value = SOLUTION; }
+
+// ── Visualizer ───────────────────────────────────────────────────────────────
+let vizSteps = [], vizIdx = 0, vizNums = [];
+
+function buildSteps(nums) {
+    const steps = [];
+    const subset = [];
+    const res = [];
+
+    function dfs(i) {
+        if (i >= nums.length) {
+            steps.push({ i, subset: [...subset], action: 'record', resCount: res.length + 1 });
+            res.push([...subset]);
+            return;
+        }
+        steps.push({ i, subset: [...subset], action: `at i=${i} val=${nums[i]}`, resCount: res.length });
+        subset.push(nums[i]);
+        steps.push({ i, subset: [...subset], action: `include ${nums[i]}`, resCount: res.length });
+        dfs(i + 1);
+        subset.pop();
+        steps.push({ i, subset: [...subset], action: `backtrack (pop ${nums[i]})`, resCount: res.length });
+        steps.push({ i, subset: [...subset], action: `skip ${nums[i]}`, resCount: res.length });
+        dfs(i + 1);
+    }
+
+    dfs(0);
+    return steps;
+}
+
+function subsetStr(s) { return '[' + s.join(', ') + ']'; }
+
+// Simple SVG tree builder
+function buildTree(nums) {
+    const n = nums.length;
+    const levels = n + 1;
+    const nodeR  = 22;
+    const hGap   = Math.max(60, 600 / Math.pow(2, n));
+    const vGap   = 80;
+    const pad    = 40;
+    const totalLeaves = Math.pow(2, n);
+    const svgW   = Math.max(700, totalLeaves * hGap + pad * 2);
+    const svgH   = levels * vGap + pad * 2;
+
+    const nodes = [];
+    const links = [];
+    let id = 0;
+
+    function place(depth, path, subset) {
+        const nid = id++;
+        nodes.push({ id: nid, depth, path, subset: [...subset] });
+        return nid;
+    }
+
+    function dfs(depth, path, subset, parentId) {
+        const nid = place(depth, path, subset);
+        if (parentId !== null) links.push({ from: parentId, to: nid, label: path.slice(-1) === 'I' ? 'incl' : 'skip' });
+        if (depth >= n) return;
+        subset.push(nums[depth]);
+        dfs(depth + 1, path + 'I', subset, nid);
+        subset.pop();
+        dfs(depth + 1, path + 'E', subset, nid);
+    }
+    dfs(0, '', [], null);
+
+    // compute x positions by level
+    const byLevel = Array.from({ length: levels }, () => []);
+    nodes.forEach(nd => byLevel[nd.depth].push(nd));
+    byLevel.forEach((lvl, d) => {
+        lvl.sort((a, b) => a.path.localeCompare(b.path));
+        const count = lvl.length;
+        const span  = svgW - pad * 2;
+        lvl.forEach((nd, idx) => {
+            nd.x = pad + (count === 1 ? span / 2 : (idx / (count - 1)) * span);
+            nd.y = pad + d * vGap;
+        });
+    });
+
+    const byId = new Map(nodes.map(nd => [nd.id, nd]));
+    return { nodes, links, byId, svgW, svgH, nodeR };
+}
+
+let treeData = null;
+
+function renderSVG(nums) {
+    treeData = buildTree(nums);
+    const { nodes, links, byId, svgW, svgH, nodeR } = treeData;
+
+    const linksSVG = links.map(l => {
+        const f = byId.get(l.from), t = byId.get(l.to);
+        const mx = (f.x + t.x) / 2, my = (f.y + t.y) / 2;
+        return `<line id="lk-${l.from}-${l.to}" x1="${f.x}" y1="${f.y+nodeR}" x2="${t.x}" y2="${t.y-nodeR}" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+                <text x="${mx}" y="${my}" fill="rgba(255,255,255,0.3)" font-size="10" font-family="JetBrains Mono,monospace" text-anchor="middle">${l.label}</text>`;
+    }).join('');
+
+    const nodesSVG = nodes.map(nd => {
+        const isLeaf = nd.depth === nums.length;
+        const fill   = isLeaf ? 'rgba(0,255,148,0.12)' : 'var(--bg-secondary)';
+        const stroke = isLeaf ? 'var(--success)' : 'rgba(255,255,255,0.2)';
+        const lbl    = subsetStr(nd.subset) || '[]';
+        return `<g id="nd-${nd.id}">
+            <circle id="nd-c-${nd.id}" cx="${nd.x}" cy="${nd.y}" r="${nodeR}" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/>
+            <text x="${nd.x}" y="${nd.y + 4}" fill="var(--text-primary)" font-size="11" font-family="JetBrains Mono,monospace" text-anchor="middle">${nd.depth}</text>
+            <text x="${nd.x}" y="${nd.y + nodeR + 14}" fill="rgba(255,255,255,0.4)" font-size="9" font-family="JetBrains Mono,monospace" text-anchor="middle">${lbl}</text>
+        </g>`;
+    }).join('');
+
+    document.getElementById('treeViz').innerHTML =
+        `<svg viewBox="0 0 ${svgW} ${svgH}" width="${svgW}" height="${svgH}" style="min-width:${svgW}px">${linksSVG}${nodesSVG}</svg>`;
+}
+
+function highlightStep(step) {
+    if (!treeData) return;
+    // reset
+    treeData.nodes.forEach(nd => {
+        const c = document.getElementById(`nd-c-${nd.id}`);
+        if (!c) return;
+        const isLeaf = nd.depth === vizNums.length;
+        c.setAttribute('fill',   isLeaf ? 'rgba(0,255,148,0.12)' : 'var(--bg-secondary)');
+        c.setAttribute('stroke', isLeaf ? 'var(--success)' : 'rgba(255,255,255,0.2)');
+    });
+    // find matching node
+    const subKey = subsetStr(step.subset);
+    const match = treeData.nodes.find(nd => nd.depth === step.i && subsetStr(nd.subset) === subKey);
+    if (match) {
+        const c = document.getElementById(`nd-c-${match.id}`);
+        if (c) { c.setAttribute('fill', 'var(--accent-primary)'); c.setAttribute('stroke', 'var(--accent-primary)'); }
+    }
+}
+
+function startViz() {
+    const raw = document.getElementById('vizInput').value;
+    vizNums = raw.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+    if (!vizNums.length) { alert('Enter valid numbers'); return; }
+    vizSteps = buildSteps(vizNums);
+    vizIdx = 0;
+    renderSVG(vizNums);
+    document.getElementById('stepBtn').disabled = false;
+    document.getElementById('resetBtn').disabled = false;
+    applyStep(vizSteps[0]);
+}
+
+function applyStep(step) {
+    document.getElementById('stI').textContent      = step.i;
+    document.getElementById('stSubset').textContent = subsetStr(step.subset);
+    document.getElementById('stAction').textContent = step.action;
+    document.getElementById('stRes').textContent    = step.resCount;
+    highlightStep(step);
+}
+
+function stepViz() {
+    if (vizIdx < vizSteps.length - 1) { vizIdx++; applyStep(vizSteps[vizIdx]); }
+}
+
+function resetViz() {
+    vizSteps = []; vizIdx = 0; vizNums = [];
+    ['stI','stSubset','stAction'].forEach(id => document.getElementById(id).textContent = '—');
+    document.getElementById('stRes').textContent = '0';
+    document.getElementById('stepBtn').disabled = true;
+    document.getElementById('resetBtn').disabled = true;
+    document.getElementById('treeViz').innerHTML = '<p style="color:var(--text-secondary)">Enter an array and click Start to visualize.</p>';
+}
+</script>
+</body>
+</html>

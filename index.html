@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeetCode Learning Guides</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Playfair+Display:wght@700;900&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary:   #0a0e1a;
+            --bg-secondary: #141825;
+            --bg-tertiary:  #1e2433;
+            --accent-primary:   #00d4ff;
+            --accent-secondary: #ff006e;
+            --accent-tertiary:  #8338ec;
+            --text-primary:   #e8eaed;
+            --text-secondary: #9aa0a6;
+            --text-muted:     #5f6368;
+            --success: #00ff94;
+            --warning: #ffba08;
+            --border: rgba(255,255,255,0.1);
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        header {
+            max-width: 900px;
+            margin: 3rem auto 2.5rem;
+            padding: 0 1.5rem;
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: .6rem;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 1.5rem 4rem;
+        }
+
+        .problem-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .problem-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem 1.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            transition: transform .25s, box-shadow .25s, border-color .25s;
+        }
+
+        .problem-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0,212,255,.18);
+            border-color: var(--accent-primary);
+        }
+
+        .problem-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .85rem;
+            color: var(--text-muted);
+            min-width: 48px;
+        }
+
+        .problem-name {
+            flex: 1;
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .problem-name:hover { color: var(--accent-primary); }
+
+        .problem-tags {
+            display: flex;
+            gap: .5rem;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .tag {
+            padding: .25rem .75rem;
+            border-radius: 20px;
+            font-size: .75rem;
+            font-weight: 600;
+        }
+
+        .tag-pattern {
+            background: rgba(131,56,236,.2);
+            border: 1px solid var(--accent-tertiary);
+            color: var(--accent-tertiary);
+        }
+
+        .badge-medium {
+            background: rgba(255,186,8,.15);
+            border: 1px solid var(--warning);
+            color: var(--warning);
+        }
+
+        .badge-easy {
+            background: rgba(0,255,148,.12);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+
+        .badge-hard {
+            background: rgba(255,0,110,.12);
+            border: 1px solid var(--accent-secondary);
+            color: var(--accent-secondary);
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            .problem-item { flex-wrap: wrap; }
+            .problem-tags { justify-content: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>NeetCode Learning Guides</h1>
+    <p>Interactive problem guides for coding interview preparation — sorted by problem number.</p>
+</header>
+
+<main>
+    <ul class="problem-list">
+
+        <li class="problem-item">
+            <span class="problem-num">LC 78</span>
+            <a class="problem-name" href="html/lc-78-subsets-1.html">Subsets</a>
+            <div class="problem-tags">
+                <span class="tag tag-pattern">Backtracking</span>
+                <span class="tag badge-medium">Medium</span>
+            </div>
+        </li>
+
+        <li class="problem-item">
+            <span class="problem-num">LC 90</span>
+            <a class="problem-name" href="html/lc-90-subsets-2.html">Subsets II</a>
+            <div class="problem-tags">
+                <span class="tag tag-pattern">Backtracking</span>
+                <span class="tag badge-medium">Medium</span>
+            </div>
+        </li>
+
+    </ul>
+</main>
+
+</body>
+</html>

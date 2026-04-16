@@ -10,8 +10,10 @@ The goal is consistent depth, pedagogy, and section order across all problems.
 - Audience: learners preparing for coding interviews.
 - Section order: must exactly follow the order in this file.
 - Every section must be present. If data is unknown, write `TBD` and state what is missing.
+- **All code is Python only.** Every section that involves code, examples, or concept illustration must use a runnable Python snippet. No pseudocode, no other languages.
 - Include at least one runnable solution in Python.
 - Include time and space complexity for the main solution.
+- Use NeetCode's exact variable names in all code (primary solution, dry run, starter code, alternatives, mistakes, and quick reference template). NeetCode uses consistent variable names across problems of the same pattern (e.g. `res`, `subset`, `cur`, `left`, `right`, `dp`) — mirror these exactly so learners can cross-reference NeetCode solutions without mental translation. If NeetCode's variable name for a concept is unknown, use the most common convention and mark it `# NeetCode var: TBD`.
 - Use consistent variable naming across all sections.
 
 ## 2. Required Frontmatter (Top of Every Problem)
@@ -45,10 +47,12 @@ last_updated: <YYYY-MM-DD>
   - Input
   - Output
   - Brief explanation of why output is correct
+- Include a runnable Python snippet that prints both examples and confirms expected output with an `assert`.
 
 ### Key Insight
 - 1 short paragraph with the core intuition.
 - Include any key counting formula (like `2^n`, `n!`, `n^2`, etc.) where relevant.
+- Include a Python snippet that illustrates the formula (e.g., `2**n` for n in range).
 
 ### Complexity Snapshot
 - Main approach time complexity.
@@ -62,11 +66,13 @@ last_updated: <YYYY-MM-DD>
 ### Concept 1: Pattern Definition
 - Define the core pattern for this problem.
 - Explain why this pattern fits.
+- Include a minimal Python skeleton (no more than 10 lines) that shows the pattern shape.
 
 ### Concept 2: Decision Process / State View
 - Show how decisions are made at each step.
 - If recursive: explain state as `(index, path, extra_state...)`.
 - If iterative/DP: explain state transition.
+- Include a Python snippet that prints each `(i, subset, action)` state as the algorithm runs, so the learner can see the trace.
 
 ### Concept 3: When to Use This Pattern
 - 3-5 bullet triggers that suggest this pattern.
@@ -74,6 +80,7 @@ last_updated: <YYYY-MM-DD>
 
 ### Important Caveat
 - One warning box equivalent: most common conceptual mistake for this pattern.
+- Include a Python snippet showing the wrong version and what goes wrong, followed by the fix.
 
 ---
 
@@ -91,17 +98,20 @@ Break the primary solution into numbered steps (typically 5-8):
 8. Return final result.
 
 For each step include:
-- Mini code snippet.
+
+- Mini Python code snippet.
 - Why this step is needed.
 
 ### Complete Solution (Primary)
 - Full Python code block.
 - Must be runnable as-is.
+- Include a `print` call with the expected output in a comment.
 - Use readable names (avoid one-letter names except loop indexes).
 
 ### Dry Run
 - One complete dry run on a non-trivial input.
 - Show key state changes line-by-line or step-by-step.
+- Include a Python trace snippet that instruments the solution to print each state row automatically, reproducing the dry run table.
 
 ---
 
@@ -111,6 +121,7 @@ Even if no UI is built, provide a visualizer spec so future tooling can consume 
 
 ### Visualizer Input
 - Input format and sample input.
+- Python snippet that defines the sample input variable.
 
 ### State Fields to Track
 - Current index/pointer/state ID.
@@ -121,6 +132,7 @@ Even if no UI is built, provide a visualizer spec so future tooling can consume 
 ### Step Events
 - Define event types (e.g., `include`, `exclude`, `backtrack`, `update_best`).
 - Define what changes in state for each event.
+- Include a Python generator or list that yields each step event as a dict.
 
 ### Tree / Graph / Table Representation
 - State what structure should be rendered.
@@ -133,6 +145,7 @@ Even if no UI is built, provide a visualizer spec so future tooling can consume 
 - Each question must have 4 options (A-D).
 - Exactly 1 correct answer per question.
 - Include explanation for each answer.
+- **Each answer must include a runnable Python snippet** that demonstrates or proves why the answer is correct.
 - Coverage requirements:
   - 1 question on complexity
   - 1 on correctness invariant
@@ -144,14 +157,21 @@ Even if no UI is built, provide a visualizer spec so future tooling can consume 
 ## Code Playground
 
 ### Starter Code
-- Provide editable starter Python code.
-- Include one default test case.
+
+- Provide editable starter Python code with TODO comments.
+- Include one default test case with `print` and an expected output comment.
 
 ### Suggested Experiments
-- Provide 3 challenges:
-  1. Constraint variant (e.g., size `k`, duplicates, bounded sum)
-  2. Alternative paradigm (iterative vs recursive, memoized vs tabulated)
-  3. Optimization or proof task
+
+- Provide 3 challenges, each with:
+  1. Problem description.
+  2. A Python starter scaffold (function signature + TODO body + test call).
+
+  Challenges:
+
+  - Constraint variant (e.g., size `k`, duplicates, bounded sum)
+  - Alternative paradigm (iterative vs recursive, memoized vs tabulated)
+  - Optimization or proof task
 
 ---
 
@@ -161,7 +181,7 @@ Provide at least 2 alternatives.
 
 For each alternative include:
 - Short intuition.
-- Python code snippet.
+- Full runnable Python code snippet with a `print` and expected output comment.
 - Time complexity.
 - Space complexity.
 - When to prefer it.
@@ -183,8 +203,8 @@ Provide exactly 4 mistakes.
 
 For each mistake include:
 - Mistake title.
-- Wrong snippet.
-- Correct snippet.
+- Wrong Python snippet (runnable, shows the bug in action with a `print` that reveals the incorrect output).
+- Correct Python snippet (runnable, shows correct output).
 - Why the wrong version fails.
 - Quick check to avoid it.
 
@@ -193,23 +213,27 @@ For each mistake include:
 ## Flashcards
 
 Provide exactly 3 flashcards:
+
 - Card 1: base case / stopping condition
 - Card 2: complexity reasoning
 - Card 3: core pattern intuition
 
 Format each as:
-- Front (question)
-- Back (concise answer)
+
+- **Front:** question
+- **Back:** concise prose answer + a short Python snippet (≤ 6 lines) that illustrates the answer
 
 ---
 
 ## Quick Reference
 
 ### Template Code
-- Minimal reusable template for this pattern.
-- Should be copy-ready.
+
+- Minimal reusable Python template for this pattern.
+- Should be copy-ready with a test call at the bottom.
 
 ### Pattern Mnemonic
+
 - One-line execution mnemonic (example format: `Initialize -> Recurse -> Backtrack -> Return`).
 
 ### Key Metrics
@@ -379,7 +403,42 @@ Back: ...
 4. ...
 ```
 
-## 6. Notes for Future LLM Runs
+## 6. File Naming Convention
+
+All guide files must follow the pattern: `lc-{problem_number}-{slug}.{ext}`
+
+- `lc-` prefix identifies a LeetCode problem (use `nc-` for NeetCode-only problems)
+- `{problem_number}` is the LeetCode problem number (enables natural sort by number)
+- `{slug}` is the problem title in lowercase, hyphen-separated (e.g., `subsets-2`, `two-sum`)
+- `.md` for the Markdown text guide; `.html` for the rendered/visual guide
+- Paired `.md` and `.html` files for the same problem share an identical base name
+
+### Project Structure
+
+```text
+index.html
+md/
+  lc-78-subsets-1.md
+  lc-90-subsets-2.md
+html/
+  lc-78-subsets-1.html
+  lc-90-subsets-2.html
+```
+
+When generating a new problem guide, always produce **two files**:
+
+1. `md/lc-{number}-{slug}.md` — the full Markdown guide following this spec
+2. `html/lc-{number}-{slug}.html` — a rendered HTML version of the same guide
+
+After creating the two files, always **update `index.html`** at the project root to add a link to the new `html/lc-{number}-{slug}.html`. The index should list all problems in ascending order by problem number. If `index.html` does not exist yet, create it with a simple, clean page that lists all current problems as links.
+
+**Examples:**
+
+- `md/lc-78-subsets-1.md` / `html/lc-78-subsets-1.html`
+- `md/lc-90-subsets-2.md` / `html/lc-90-subsets-2.html`
+- `md/lc-1-two-sum.md` / `html/lc-1-two-sum.html`
+
+## 7. Notes for Future LLM Runs
 
 - Keep explanations short per section but complete across the full guide.
 - Prefer correctness and consistency over stylistic variation.
