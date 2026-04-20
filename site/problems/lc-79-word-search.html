@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Search Problem - Interactive Learning Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:wght@700;900&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #141825;
+            --bg-tertiary: #1e2433;
+            --accent-primary: #00d4ff;
+            --accent-secondary: #ff006e;
+            --accent-tertiary: #8338ec;
+            --text-primary: #e8eaed;
+            --text-secondary: #9aa0a6;
+            --text-muted: #5f6368;
+            --success: #00ff94;
+            --warning: #ffba08;
+            --danger: #ff006e;
+            --code-bg: #0d1117;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        .problem-header {
+            max-width: 1200px;
+            margin: 1.5rem auto 1rem;
+            padding: 1.75rem 2rem;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(20, 24, 37, 0.96), rgba(30, 36, 51, 0.92));
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .problem-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .problem-tagline { font-size: 1.1rem; color: var(--text-secondary); }
+
+        .difficulty-badge {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            background: rgba(255, 186, 8, 0.2);
+            border: 2px solid var(--warning);
+            border-radius: 30px;
+            color: var(--warning);
+            font-weight: 600;
+        }
+
+        nav {
+            position: sticky;
+            top: 0;
+            background: rgba(10, 14, 26, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-links { display: flex; gap: 1.1rem; list-style: none; flex-wrap: wrap; }
+
+        .nav-tab-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            background: transparent;
+            border: none;
+            font: inherit;
+            cursor: pointer;
+        }
+
+        .nav-tab-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-primary);
+            transition: width 0.3s;
+        }
+
+        .nav-tab-link:hover, .nav-tab-link.active { color: var(--accent-primary); }
+        .nav-tab-link:hover::after, .nav-tab-link.active::after { width: 100%; }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            width: 0%;
+            z-index: 9999;
+            transition: width 0.1s;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 3rem 2rem; }
+
+        .section { display: none; }
+        .section.active-page { display: block; animation: fadeIn 0.35s ease; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-tertiary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-top: 1.2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.4rem;
+            text-align: center;
+        }
+
+        .stat-value { font-size: 1.8rem; font-family: 'JetBrains Mono', monospace; color: var(--accent-primary); }
+        .stat-label { color: var(--text-secondary); font-size: 0.9rem; }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1rem;
+        }
+
+        .code-block {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            overflow-x: auto;
+            margin-top: 0.8rem;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 0.7rem;
+            padding-bottom: 0.4rem;
+        }
+
+        .code-lang { color: var(--accent-primary); font-size: 0.8rem; font-weight: 600; }
+        .copy-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 0.3rem 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+        }
+
+        pre { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--text-primary); white-space: pre-wrap; }
+
+        .tabs { display: flex; gap: 0.6rem; border-bottom: 1px solid var(--border); margin-bottom: 1rem; flex-wrap: wrap; }
+        .tab {
+            padding: 0.65rem 1rem;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        .tab.active { color: var(--accent-primary); border-bottom-color: var(--accent-primary); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .step-by-step { border: 1px solid var(--border); border-radius: 10px; padding: 1rem; }
+        .step { display: flex; gap: 1rem; padding: 0.8rem 0; border-bottom: 1px solid var(--border); }
+        .step:last-child { border-bottom: none; }
+        .step-number {
+            width: 34px; height: 34px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            display: inline-flex; align-items: center; justify-content: center;
+            font-weight: 700; color: #041018; flex-shrink: 0;
+        }
+
+        .checklist { list-style: none; }
+        .checklist li { padding: 0.5rem 0; color: var(--text-primary); }
+
+        .alert {
+            border-radius: 8px;
+            padding: 0.9rem 1rem;
+            margin-top: 1rem;
+            border: 1px solid var(--border);
+        }
+        .alert-info { background: rgba(0, 212, 255, 0.08); color: var(--accent-primary); }
+        .alert-warning { background: rgba(255, 186, 8, 0.08); color: var(--warning); }
+        .alert-success { background: rgba(0, 255, 148, 0.08); color: var(--success); }
+
+        .visualizer {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.2rem;
+        }
+
+        .controls { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 1rem; }
+        .control-input {
+            min-width: 180px;
+            padding: 0.6rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .btn {
+            padding: 0.58rem 1rem;
+            border: 1px solid var(--accent-primary);
+            background: transparent;
+            color: var(--accent-primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .word-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 68px);
+            gap: 6px;
+            justify-content: center;
+            margin: 0.8rem 0 1rem;
+        }
+
+        .word-cell {
+            width: 68px;
+            height: 68px;
+            border: 2px solid #101317;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #d8d8d8;
+            color: #041018;
+            font-size: 2rem;
+            font-family: 'JetBrains Mono', monospace;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .word-cell.current { background: #00d4ff; color: #031017; transform: scale(1.03); }
+        .word-cell.path { background: #ffba08; color: #1f1400; }
+        .word-cell.fail { background: #ff5c8a; color: #2d0013; }
+
+        .state-display {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.9rem;
+        }
+
+        .state-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.35rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .state-row:last-child { border-bottom: none; }
+        .state-label { color: var(--text-secondary); }
+        .state-value { color: var(--accent-primary); font-family: 'JetBrains Mono', monospace; }
+
+        .quiz-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .quiz-option {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.7rem 0.9rem;
+            margin: 0.5rem 0;
+            cursor: pointer;
+        }
+
+        .quiz-option.correct { border-color: var(--success); background: rgba(0,255,148,0.12); }
+        .quiz-option.incorrect { border-color: var(--danger); background: rgba(255,0,110,0.12); }
+
+        .quiz-feedback {
+            display: none;
+            margin-top: 0.7rem;
+            padding: 0.7rem;
+            border-radius: 8px;
+        }
+        .quiz-feedback.show { display: block; }
+        .quiz-feedback.correct { border: 1px solid var(--success); color: var(--success); }
+        .quiz-feedback.incorrect { border: 1px solid var(--danger); color: var(--danger); }
+
+        .playground textarea {
+            width: 100%;
+            min-height: 220px;
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            border-radius: 8px;
+            padding: 0.8rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            resize: vertical;
+        }
+
+        .output {
+            margin-top: 0.8rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.8rem;
+            min-height: 64px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.83rem;
+        }
+
+        .flashcard {
+            position: relative;
+            min-height: 220px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
+            padding: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .flashcard-front, .flashcard-back { position: absolute; width: calc(100% - 2.4rem); transition: opacity 0.25s ease; }
+        .flashcard-back { opacity: 0; }
+        .flashcard.flipped .flashcard-front { opacity: 0; }
+        .flashcard.flipped .flashcard-back { opacity: 1; }
+
+        @media (max-width: 900px) {
+            nav { align-items: flex-start; }
+            .word-grid { grid-template-columns: repeat(4, 56px); }
+            .word-cell { width: 56px; height: 56px; font-size: 1.55rem; }
+            .section-title { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <header class="problem-header">
+        <div>
+            <h1 class="problem-title">Word Search</h1>
+            <p class="problem-tagline">Backtracking + matrix DFS with no cell reuse</p>
+        </div>
+        <div class="difficulty-badge">MEDIUM</div>
+    </header>
+
+    <nav id="mainNav">
+        <div style="font-weight: 700; color: var(--accent-primary);">Word Search Guide</div>
+        <ul class="nav-links">
+            <li><a href="#problem" class="nav-tab-link" data-section="problem">Problem</a></li>
+            <li><a href="#concepts" class="nav-tab-link" data-section="concepts">Concepts</a></li>
+            <li><a href="#walkthrough" class="nav-tab-link" data-section="walkthrough">Walkthrough</a></li>
+            <li><a href="#visualizer-section" class="nav-tab-link" data-section="visualizer-section">Visualizer</a></li>
+            <li><a href="#quiz" class="nav-tab-link" data-section="quiz">Quiz</a></li>
+            <li><a href="#playground" class="nav-tab-link" data-section="playground">Playground</a></li>
+            <li><a href="#alternatives" class="nav-tab-link" data-section="alternatives">Alternatives</a></li>
+            <li><a href="#mistakes" class="nav-tab-link" data-section="mistakes">Mistakes</a></li>
+            <li><a href="#flashcards" class="nav-tab-link" data-section="flashcards">Flashcards</a></li>
+            <li><a href="#reference" class="nav-tab-link" data-section="reference">Reference</a></li>
+            <li><a href="#next-steps" class="nav-tab-link" data-section="next-steps">Next Steps</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <section id="problem" class="section">
+            <h2 class="section-title">Problem Statement</h2>
+            <div class="card">
+                <h3>Challenge</h3>
+                <p>Given a 2D board and a string <code>word</code>, return <code>True</code> if the word can be formed by adjacent cells (up/down/left/right), without reusing any cell in the same path.</p>
+                <div class="grid-2" style="margin-top: 1rem;">
+                    <div>
+                        <h4>Example 1</h4>
+                        <div class="code-block">
+                            <div class="code-header"><span class="code-lang">Input / Output</span></div>
+                            <pre>board = [["A","B","C","D"],
+         ["S","A","A","T"],
+         ["A","C","A","E"]]
+word = "CAT"
+Output: True</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h4>Example 2</h4>
+                        <div class="code-block">
+                            <div class="code-header"><span class="code-lang">Input / Output</span></div>
+                            <pre>board = [["A","B","C","D"],
+         ["S","A","A","T"],
+         ["A","C","A","E"]]
+word = "BAT"
+Output: False</pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="alert alert-info"><strong>Key Insight:</strong> Start DFS from every cell. On match, mark current cell used, explore 4 directions for next index, then unmark on return.</div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-value">O(m·4ⁿ)</div><div class="stat-label">Time Complexity</div></div>
+                <div class="stat-card"><div class="stat-value">O(n)</div><div class="stat-label">Recursion Stack</div></div>
+                <div class="stat-card"><div class="stat-value">n</div><div class="stat-label">Max Depth = len(word)</div></div>
+            </div>
+        </section>
+
+        <section id="concepts" class="section">
+            <h2 class="section-title">Core Concepts</h2>
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab(event, 'concept-pattern')">Pattern</button>
+                <button class="tab" onclick="switchTab(event, 'concept-state')">State View</button>
+                <button class="tab" onclick="switchTab(event, 'concept-usage')">Usage</button>
+            </div>
+
+            <div id="concept-pattern" class="tab-content active">
+                <div class="card">
+                    <h3>Backtracking DFS Pattern</h3>
+                    <pre>def dfs(r, c, i):
+    if i == len(word):
+        return True
+    if invalid_state:
+        return False
+
+    mark(r, c)
+    found = dfs(r+1,c,i+1) or dfs(r-1,c,i+1) or dfs(r,c+1,i+1) or dfs(r,c-1,i+1)
+    unmark(r, c)
+    return found</pre>
+                    <div class="alert alert-warning">Always restore the cell after exploring neighbors. Failing to unmark causes false negatives later.</div>
+                </div>
+            </div>
+
+            <div id="concept-state" class="tab-content">
+                <div class="card">
+                    <h3>Decision State</h3>
+                    <ul class="checklist">
+                        <li><strong>(r, c):</strong> current board coordinates</li>
+                        <li><strong>i:</strong> index in <code>word</code> to match</li>
+                        <li><strong>path:</strong> currently used cells in this branch</li>
+                    </ul>
+                    <div class="code-block">
+                        <div class="code-header"><span class="code-lang">Trace Example</span></div>
+                        <pre>state=(0,2,0)  need='C'  action=mark
+state=(1,2,1)  need='A'  action=mark
+state=(1,3,2)  need='T'  action=mark
+state=(1,3,3)  action=success</pre>
+                    </div>
+                </div>
+            </div>
+
+            <div id="concept-usage" class="tab-content">
+                <div class="card">
+                    <h3>When to Use This Pattern</h3>
+                    <div class="step-by-step">
+                        <div class="step"><div class="step-number">1</div><div><h4>Grid Path Existence</h4><p>Need to confirm if any path forms a target string/pattern.</p></div></div>
+                        <div class="step"><div class="step-number">2</div><div><h4>Local Moves</h4><p>Movement is constrained to neighbors (4 or 8 directions).</p></div></div>
+                        <div class="step"><div class="step-number">3</div><div><h4>No Reuse in One Path</h4><p>Visited-state tracking is required for each recursion branch.</p></div></div>
+                    </div>
+                    <h4 style="margin-top: 1rem;">Related Problems</h4>
+                    <ul class="checklist">
+                        <li>LeetCode 212 Word Search II</li>
+                        <li>LeetCode 200 Number of Islands</li>
+                        <li>LeetCode 130 Surrounded Regions</li>
+                        <li>LeetCode 980 Unique Paths III</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="walkthrough" class="section">
+            <h2 class="section-title">Step-by-Step Walkthrough</h2>
+            <div class="step-by-step card">
+                <div class="step"><div class="step-number">1</div><div><h4>Initialize Dimensions</h4><pre>ROWS, COLS = len(board), len(board[0])</pre></div></div>
+                <div class="step"><div class="step-number">2</div><div><h4>Base Case</h4><pre>if i == len(word):
+    return True</pre></div></div>
+                <div class="step"><div class="step-number">3</div><div><h4>Guard Invalid State</h4><pre>if r < 0 or c < 0 or r >= ROWS or c >= COLS:
+    return False
+if board[r][c] != word[i] or board[r][c] == '#':
+    return False</pre></div></div>
+                <div class="step"><div class="step-number">4</div><div><h4>Mark, Explore, Unmark</h4><pre>temp = board[r][c]
+board[r][c] = '#'
+res = dfs(r+1,c,i+1) or dfs(r-1,c,i+1) or dfs(r,c+1,i+1) or dfs(r,c-1,i+1)
+board[r][c] = temp</pre></div></div>
+                <div class="step"><div class="step-number">5</div><div><h4>Try Every Start Cell</h4><pre>for r in range(ROWS):
+    for c in range(COLS):
+        if dfs(r, c, 0):
+            return True
+return False</pre></div></div>
+            </div>
+
+            <div class="card">
+                <h3>Complete Solution (Python)</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">python</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+<pre>from typing import List
+
+class Solution:
+    def exist(self, board: List[List[str]], word: str) -> bool:
+        ROWS, COLS = len(board), len(board[0])
+
+        def dfs(r, c, i):
+            if i == len(word):
+                return True
+            if r < 0 or c < 0 or r >= ROWS or c >= COLS:
+                return False
+            if board[r][c] != word[i] or board[r][c] == '#':
+                return False
+
+            temp = board[r][c]
+            board[r][c] = '#'
+            res = (dfs(r + 1, c, i + 1) or
+                   dfs(r - 1, c, i + 1) or
+                   dfs(r, c + 1, i + 1) or
+                   dfs(r, c - 1, i + 1))
+            board[r][c] = temp
+            return res
+
+        for r in range(ROWS):
+            for c in range(COLS):
+                if dfs(r, c, 0):
+                    return True
+        return False</pre>
+                </div>
+            </div>
+        </section>
+
+        <section id="visualizer-section" class="section">
+            <h2 class="section-title">Interactive Visualizer</h2>
+            <div class="visualizer">
+                <div class="controls">
+                    <select id="vizScenario" class="control-input">
+                        <option value="CAT">Scenario: word = CAT (success path)</option>
+                        <option value="BAT">Scenario: word = BAT (fails)</option>
+                    </select>
+                    <button class="btn" onclick="startVisualization()">Start</button>
+                    <button class="btn" id="stepBtn" onclick="stepVisualization()" disabled>Next Step</button>
+                    <button class="btn" id="resetBtn" onclick="resetVisualization()" disabled>Reset</button>
+                </div>
+
+                <div class="word-grid" id="wordGrid"></div>
+
+                <div class="state-display">
+                    <div class="state-row"><span class="state-label">Word</span><span class="state-value" id="stateWord">-</span></div>
+                    <div class="state-row"><span class="state-label">Current Index i</span><span class="state-value" id="stateIndex">-</span></div>
+                    <div class="state-row"><span class="state-label">Current Cell (r,c)</span><span class="state-value" id="stateCell">-</span></div>
+                    <div class="state-row"><span class="state-label">Action</span><span class="state-value" id="stateAction">-</span></div>
+                    <div class="state-row"><span class="state-label">Path</span><span class="state-value" id="statePath">[]</span></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="quiz" class="section">
+            <h2 class="section-title">Knowledge Check</h2>
+
+            <div class="quiz-container" id="quiz1">
+                <h4>1. What is the worst-case time complexity?</h4>
+                <div class="quiz-option" onclick="checkAnswer(event, 1, 'A', false)"><strong>A.</strong> O(m * n)</div>
+                <div class="quiz-option" onclick="checkAnswer(event, 1, 'B', false)"><strong>B.</strong> O(m * 2^n)</div>
+                <div class="quiz-option" onclick="checkAnswer(event, 1, 'C', true)"><strong>C.</strong> O(m * 4^n)</div>
+                <div class="quiz-option" onclick="checkAnswer(event, 1, 'D', false)"><strong>D.</strong> O(4^m)</div>
+                <div class="quiz-feedback" id="feedback1">Correct is C. We try m start cells, and each recursive level can branch to 4 neighbors.</div>
+            </div>
+
+            <div class="quiz-container" id="quiz2">
+                <h4>2. Which invariant must hold for each DFS path?</h4>
+                <div class="quiz-option" onclick="checkAnswer(event, 2, 'A', false)"><strong>A.</strong> Diagonal move happens at least once</div>
+                <div class="quiz-option" onclick="checkAnswer(event, 2, 'B', true)"><strong>B.</strong> No cell is reused in the same path</div>
+                <div class="quiz-option" onclick="checkAnswer(event, 2, 'C', false)"><strong>C.</strong> Start at (0,0)</div>
+                <div class="quiz-option" onclick="checkAnswer(event, 2, 'D', false)"><strong>D.</strong> Always go right first</div>
+                <div class="quiz-feedback" id="feedback2">Correct is B. Reusing a cell in one path violates the problem constraints.</div>
+            </div>
+
+            <div class="quiz-container" id="quiz3">
+                <h4>3. For word length 1, when do we return true?</h4>
+                <div class="quiz-option" onclick="checkAnswer(event, 3, 'A', false)"><strong>A.</strong> Board is square</div>
+                <div class="quiz-option" onclick="checkAnswer(event, 3, 'B', false)"><strong>B.</strong> First row contains the letter</div>
+                <div class="quiz-option" onclick="checkAnswer(event, 3, 'C', true)"><strong>C.</strong> Any cell matches word[0]</div>
+                <div class="quiz-option" onclick="checkAnswer(event, 3, 'D', false)"><strong>D.</strong> At least two matching cells exist</div>
+                <div class="quiz-feedback" id="feedback3">Correct is C. A single-character word needs one matching board cell.</div>
+            </div>
+
+            <div class="quiz-container" id="quiz4">
+                <h4>4. What happens if we do not restore the board cell after recursion?</h4>
+                <div class="quiz-option" onclick="checkAnswer(event, 4, 'A', false)"><strong>A.</strong> Algorithm turns iterative</div>
+                <div class="quiz-option" onclick="checkAnswer(event, 4, 'B', true)"><strong>B.</strong> Later paths read a mutated board and fail incorrectly</div>
+                <div class="quiz-option" onclick="checkAnswer(event, 4, 'C', false)"><strong>C.</strong> Only space complexity changes</div>
+                <div class="quiz-option" onclick="checkAnswer(event, 4, 'D', false)"><strong>D.</strong> Nothing changes</div>
+                <div class="quiz-feedback" id="feedback4">Correct is B. Mutation must be local to one path, then undone.</div>
+            </div>
+
+            <div class="alert alert-success" id="quizComplete" style="display:none;">
+                <strong>Quiz complete.</strong> Continue to playground and visualizer practice.
+            </div>
+        </section>
+
+        <section id="playground" class="section">
+            <h2 class="section-title">Code Playground</h2>
+            <div class="playground card">
+                <textarea id="codeEditor">from typing import List
+
+class Solution:
+    def exist(self, board: List[List[str]], word: str) -> bool:
+        ROWS, COLS = len(board), len(board[0])
+
+        def dfs(r, c, i):
+            # TODO: base case
+            # TODO: invalid state checks
+            # TODO: mark, recurse, unmark
+            return False
+
+        # TODO: try every start cell
+        return False
+
+board = [["A","B","C","D"],["S","A","A","T"],["A","C","A","E"]]
+print(Solution().exist(board, "CAT"))</textarea>
+                <div class="controls" style="margin-top: 0.8rem;">
+                    <button class="btn" onclick="runCode()">Run</button>
+                    <button class="btn" onclick="resetCode()">Reset</button>
+                </div>
+                <div class="output" id="codeOutput">Output will appear here...</div>
+            </div>
+        </section>
+
+        <section id="alternatives" class="section">
+            <h2 class="section-title">Alternative Approaches</h2>
+            <div class="card">
+                <h3>1) Visited Matrix</h3>
+                <p>Use <code>visited[r][c]</code> instead of mutating board cells.</p>
+                <pre>visited = [[False] * COLS for _ in range(ROWS)]
+# mark visited[r][c] = True before recursion
+# reset to False after recursion</pre>
+                <p><strong>Time:</strong> O(m * 4^n) <strong>Space:</strong> O(ROWS*COLS + n)</p>
+            </div>
+            <div class="card">
+                <h3>2) Path Set</h3>
+                <p>Track used cells in a set: <code>path.add((r,c))</code> and remove on backtrack.</p>
+                <pre>if (r, c) in path:
+    return False
+path.add((r, c))
+# recurse
+path.remove((r, c))</pre>
+                <p><strong>Time:</strong> O(m * 4^n) <strong>Space:</strong> O(n)</p>
+            </div>
+        </section>
+
+        <section id="mistakes" class="section">
+            <h2 class="section-title">Common Mistakes</h2>
+            <div class="card">
+                <ul class="checklist">
+                    <li>Forgetting to restore <code>board[r][c]</code> after recursion.</li>
+                    <li>Checking character before bounds, causing invalid reads.</li>
+                    <li>Not blocking cell reuse in the same path.</li>
+                    <li>Starting DFS from only one cell instead of all cells.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="flashcards" class="section">
+            <h2 class="section-title">Flashcards</h2>
+            <div class="flashcard" onclick="flipCard(this)">
+                <div class="flashcard-front"><strong>Front:</strong> What is the base case in Word Search DFS?</div>
+                <div class="flashcard-back"><strong>Back:</strong> Return true when <code>i == len(word)</code>. That means all characters were matched in order.</div>
+            </div>
+            <div class="flashcard" onclick="flipCard(this)">
+                <div class="flashcard-front"><strong>Front:</strong> Why O(m * 4^n)?</div>
+                <div class="flashcard-back"><strong>Back:</strong> There are m starting cells and up to 4 recursive branches for each of n character positions.</div>
+            </div>
+            <div class="flashcard" onclick="flipCard(this)">
+                <div class="flashcard-front"><strong>Front:</strong> Core intuition?</div>
+                <div class="flashcard-back"><strong>Back:</strong> Match -> mark cell used -> explore 4 neighbors -> unmark -> continue search.</div>
+            </div>
+        </section>
+
+        <section id="reference" class="section">
+            <h2 class="section-title">Quick Reference</h2>
+            <div class="card">
+                <h3>Template</h3>
+                <pre>def exist(board, word):
+    ROWS, COLS = len(board), len(board[0])
+
+    def dfs(r, c, i):
+        if i == len(word):
+            return True
+        if r < 0 or c < 0 or r >= ROWS or c >= COLS:
+            return False
+        if board[r][c] != word[i] or board[r][c] == '#':
+            return False
+        temp = board[r][c]
+        board[r][c] = '#'
+        ok = dfs(r+1,c,i+1) or dfs(r-1,c,i+1) or dfs(r,c+1,i+1) or dfs(r,c-1,i+1)
+        board[r][c] = temp
+        return ok</pre>
+                <div class="alert alert-info"><strong>Mnemonic:</strong> Match -> Mark -> Explore 4 -> Unmark -> Repeat</div>
+            </div>
+        </section>
+
+        <section id="next-steps" class="section">
+            <h2 class="section-title">Next Steps</h2>
+            <div class="card">
+                <h3>Next Challenges</h3>
+                <ul class="checklist">
+                    <li>LeetCode 200 Number of Islands</li>
+                    <li>LeetCode 130 Surrounded Regions</li>
+                    <li>LeetCode 212 Word Search II</li>
+                    <li>LeetCode 980 Unique Paths III</li>
+                </ul>
+                <h3 style="margin-top: 1rem;">Study Schedule</h3>
+                <p>Review this pattern after 1 day, 3 days, 7 days, and 14 days. Re-implement all three visited-state variants each review.</p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('progressBar').style.width = scrolled + '%';
+        });
+
+        const pageSections = Array.from(document.querySelectorAll('.container > .section'));
+        const sectionTabs = Array.from(document.querySelectorAll('.nav-tab-link'));
+        const pageSectionIds = new Set(pageSections.map(section => section.id));
+
+        function showSection(sectionId) {
+            if (!pageSectionIds.has(sectionId)) return;
+            pageSections.forEach(section => section.classList.toggle('active-page', section.id === sectionId));
+            sectionTabs.forEach(tab => tab.classList.toggle('active', tab.dataset.section === sectionId));
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function initPageTabs() {
+            sectionTabs.forEach(tab => {
+                tab.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const sectionId = tab.dataset.section;
+                    showSection(sectionId);
+                    window.history.replaceState(null, '', `#${sectionId}`);
+                });
+            });
+            const hashSectionId = window.location.hash.replace('#', '');
+            const defaultSectionId = sectionTabs[0]?.dataset.section;
+            const initialSectionId = pageSectionIds.has(hashSectionId) ? hashSectionId : defaultSectionId;
+            if (initialSectionId) showSection(initialSectionId);
+        }
+
+        window.addEventListener('hashchange', () => {
+            const hashSectionId = window.location.hash.replace('#', '');
+            if (pageSectionIds.has(hashSectionId)) showSection(hashSectionId);
+        });
+
+        initPageTabs();
+
+        function switchTab(event, tabName) {
+            const root = event.target.closest('section, .card');
+            const tabContents = root.querySelectorAll('.tab-content');
+            const tabs = event.target.closest('.tabs').querySelectorAll('.tab');
+            tabContents.forEach(content => content.classList.remove('active'));
+            tabs.forEach(tab => tab.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        const quizAnswers = {};
+        let completedQuizzes = 0;
+
+        function checkAnswer(evt, quizNum, option, isCorrect) {
+            const quiz = document.getElementById(`quiz${quizNum}`);
+            const options = quiz.querySelectorAll('.quiz-option');
+            const feedback = document.getElementById(`feedback${quizNum}`);
+            if (quizAnswers[quizNum] !== undefined) return;
+
+            options.forEach(opt => {
+                opt.style.pointerEvents = 'none';
+                if (opt.querySelector('strong').textContent === option + '.') {
+                    opt.classList.add(isCorrect ? 'correct' : 'incorrect');
+                }
+                if (!isCorrect && opt.getAttribute('onclick').includes('true')) {
+                    opt.classList.add('correct');
+                }
+            });
+
+            feedback.classList.add('show', isCorrect ? 'correct' : 'incorrect');
+            quizAnswers[quizNum] = isCorrect;
+            completedQuizzes += 1;
+            if (completedQuizzes === 4) {
+                document.getElementById('quizComplete').style.display = 'block';
+            }
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block');
+            const code = codeBlock.querySelector('pre').textContent;
+            navigator.clipboard.writeText(code);
+            const originalText = button.textContent;
+            button.textContent = 'Copied';
+            setTimeout(() => { button.textContent = originalText; }, 1200);
+        }
+
+        function flipCard(card) { card.classList.toggle('flipped'); }
+
+        const baseBoard = [
+            ['A', 'B', 'C', 'D'],
+            ['S', 'A', 'A', 'T'],
+            ['A', 'C', 'A', 'E']
+        ];
+
+        const scenarios = {
+            CAT: {
+                word: 'CAT',
+                steps: [
+                    { i: 0, cell: [0,2], action: "Start at C", path: [[0,2]], status: 'progress' },
+                    { i: 1, cell: [1,2], action: "Move down to A", path: [[0,2],[1,2]], status: 'progress' },
+                    { i: 2, cell: [1,3], action: "Move right to T", path: [[0,2],[1,2],[1,3]], status: 'progress' },
+                    { i: 3, cell: [1,3], action: "Matched all characters", path: [[0,2],[1,2],[1,3]], status: 'success' }
+                ]
+            },
+            BAT: {
+                word: 'BAT',
+                steps: [
+                    { i: 0, cell: [0,1], action: "Start at B", path: [[0,1]], status: 'progress' },
+                    { i: 1, cell: [1,1], action: "Try A below", path: [[0,1],[1,1]], status: 'progress' },
+                    { i: 2, cell: [1,2], action: "Need T but got A", path: [[0,1],[1,1]], failCell: [1,2], status: 'fail' },
+                    { i: 2, cell: [0,0], action: "No valid next move, backtrack", path: [[0,1]], failCell: [0,0], status: 'fail' },
+                    { i: 2, cell: [0,1], action: "All branches exhausted", path: [], status: 'end-fail' }
+                ]
+            }
+        };
+
+        let vizSteps = [];
+        let vizCurrentStep = 0;
+        let currentWord = '';
+
+        function buildGrid() {
+            const grid = document.getElementById('wordGrid');
+            grid.innerHTML = '';
+            for (let r = 0; r < baseBoard.length; r++) {
+                for (let c = 0; c < baseBoard[0].length; c++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'word-cell';
+                    cell.id = `cell-${r}-${c}`;
+                    cell.textContent = baseBoard[r][c];
+                    grid.appendChild(cell);
+                }
+            }
+        }
+
+        function clearGridState() {
+            document.querySelectorAll('.word-cell').forEach(cell => {
+                cell.classList.remove('path', 'current', 'fail');
+            });
+        }
+
+        function renderVizStep() {
+            if (!vizSteps.length) return;
+            clearGridState();
+            const step = vizSteps[vizCurrentStep];
+
+            step.path.forEach(([r, c]) => {
+                const cell = document.getElementById(`cell-${r}-${c}`);
+                if (cell) cell.classList.add('path');
+            });
+
+            if (step.cell) {
+                const [r, c] = step.cell;
+                const current = document.getElementById(`cell-${r}-${c}`);
+                if (current) current.classList.add('current');
+            }
+
+            if (step.failCell) {
+                const [r, c] = step.failCell;
+                const bad = document.getElementById(`cell-${r}-${c}`);
+                if (bad) bad.classList.add('fail');
+            }
+
+            document.getElementById('stateWord').textContent = currentWord;
+            document.getElementById('stateIndex').textContent = step.i;
+            document.getElementById('stateCell').textContent = step.cell ? `(${step.cell[0]}, ${step.cell[1]})` : '-';
+            document.getElementById('stateAction').textContent = step.action;
+            document.getElementById('statePath').textContent = JSON.stringify(step.path);
+
+            if (vizCurrentStep >= vizSteps.length - 1) {
+                document.getElementById('stepBtn').disabled = true;
+            }
+        }
+
+        function startVisualization() {
+            const choice = document.getElementById('vizScenario').value;
+            const scenario = scenarios[choice];
+            vizSteps = scenario.steps;
+            currentWord = scenario.word;
+            vizCurrentStep = 0;
+            buildGrid();
+            document.getElementById('stepBtn').disabled = false;
+            document.getElementById('resetBtn').disabled = false;
+            renderVizStep();
+        }
+
+        function stepVisualization() {
+            if (vizCurrentStep < vizSteps.length - 1) {
+                vizCurrentStep += 1;
+                renderVizStep();
+            }
+        }
+
+        function resetVisualization() {
+            vizSteps = [];
+            vizCurrentStep = 0;
+            currentWord = '';
+            buildGrid();
+            document.getElementById('stateWord').textContent = '-';
+            document.getElementById('stateIndex').textContent = '-';
+            document.getElementById('stateCell').textContent = '-';
+            document.getElementById('stateAction').textContent = '-';
+            document.getElementById('statePath').textContent = '[]';
+            document.getElementById('stepBtn').disabled = true;
+            document.getElementById('resetBtn').disabled = true;
+        }
+
+        function runCode() {
+            const code = document.getElementById('codeEditor').value;
+            const out = document.getElementById('codeOutput');
+            if (code.includes('exist') && code.includes('CAT')) {
+                out.innerHTML = 'Simulated run:<br>CAT -> True';
+            } else {
+                out.innerHTML = 'Update test call to include the word search example.';
+            }
+        }
+
+        function resetCode() {
+            document.getElementById('codeEditor').value = `from typing import List
+
+class Solution:
+    def exist(self, board: List[List[str]], word: str) -> bool:
+        ROWS, COLS = len(board), len(board[0])
+
+        def dfs(r, c, i):
+            # TODO: base case
+            # TODO: bounds + mismatch + visited checks
+            # TODO: mark, recurse, unmark
+            return False
+
+        for r in range(ROWS):
+            for c in range(COLS):
+                # TODO: start dfs
+                pass
+        return False
+
+board = [["A","B","C","D"],["S","A","A","T"],["A","C","A","E"]]
+print(Solution().exist(board, "CAT"))`;
+            document.getElementById('codeOutput').textContent = 'Output will appear here...';
+        }
+
+        buildGrid();
+    </script>
+</body>
+</html>
