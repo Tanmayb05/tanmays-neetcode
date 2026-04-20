@@ -3,9 +3,9 @@
 ## Directory Layout
 
 - `content/problems/`: source markdown problem guides.
-- `site/problems/`: generated HTML problem guides.
+- `site/problems/`: HTML problem guides.
 - `templates/`: reusable HTML templates.
-- `tools/`: generation and validation scripts.
+- `tools/`: validation scripts.
 - `docs/`: framework and reference documentation.
 - `examples/context/`: sample context markdown files.
 
@@ -15,11 +15,11 @@
 - HTML: `lc-{number}-{slug}.html`
 - Markdown and HTML stems should match exactly.
 
-## Generation Pipeline
+## Update Pipeline
 
 1. Create or update markdown in `content/problems/`.
-2. Generate HTML using `tools/generate_problem_html.py`.
-3. Verify output in `site/problems/`.
+2. Create or update matching HTML in `site/problems/`.
+3. Verify content and links in `site/problems/`.
 4. Run structure validation before commit.
 
 ## Canonical Paths Only

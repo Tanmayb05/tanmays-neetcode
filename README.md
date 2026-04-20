@@ -1,13 +1,11 @@
-# NeetCode Guide Generator
-
-Generate interactive HTML learning guides from markdown problem notes.
+# NeetCode Guides
 
 ## Project Layout
 
 - `content/problems/`: markdown source files
-- `site/problems/`: generated HTML files
+- `site/problems/`: HTML files
 - `templates/`: shared HTML templates
-- `tools/`: generator and validation scripts
+- `tools/`: validation scripts
 - `docs/`: framework + reference docs
 - `examples/context/`: sample context files
 
@@ -30,8 +28,6 @@ Generate interactive HTML learning guides from markdown problem notes.
 ## Quick Start
 
 ```bash
-make generate-one CONTEXT=content/problems/lc-39-combination-sum.md
-make generate-all
 make check-structure
 ```
 
