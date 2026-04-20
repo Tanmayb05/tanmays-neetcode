@@ -1,1565 +1,356 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Combination Sum — Backtracking Learning Guide</title>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:wght@700;900&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-primary: #0a0e1a;
-            --bg-secondary: #141825;
-            --bg-tertiary: #1e2433;
-            --accent-primary: #00d4ff;
-            --accent-secondary: #ff006e;
-            --accent-tertiary: #8338ec;
-            --text-primary: #e8eaed;
-            --text-secondary: #9aa0a6;
-            --text-muted: #5f6368;
-            --success: #00ff94;
-            --warning: #ffba08;
-            --danger: #ff006e;
-            --code-bg: #0d1117;
-            --border: rgba(255, 255, 255, 0.1);
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Combination Sum - Backtracking Learning Guide</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:wght@700;900&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0a0e1a;
+      --bg-secondary: #141825;
+      --bg-tertiary: #1e2433;
+      --accent-primary: #00d4ff;
+      --accent-secondary: #ff006e;
+      --accent-tertiary: #8338ec;
+      --text-primary: #e8eaed;
+      --text-secondary: #9aa0a6;
+      --success: #00ff94;
+      --warning: #ffba08;
+      --danger: #ff006e;
+      --code-bg: #0d1117;
+      --border: rgba(255, 255, 255, 0.1);
+    }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        body {
-            font-family: 'Work Sans', sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.7;
-            overflow-x: hidden;
-        }
+    body {
+      font-family: 'Work Sans', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
 
-        .progress-bar {
-            position: fixed;
-            top: 0; left: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
-            width: 0%;
-            z-index: 9999;
-            transition: width 0.1s;
-        }
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      width: 0;
+      z-index: 9999;
+      background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+      transition: width 0.1s;
+    }
 
-        /* ── Header ── */
-        .problem-header {
-            max-width: 1200px;
-            margin: 1.5rem auto 1rem;
-            padding: 1.75rem 2rem;
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            background: linear-gradient(135deg, rgba(20,24,37,.96), rgba(30,36,51,.92));
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-        }
+    .problem-header {
+      max-width: 1200px;
+      margin: 1.5rem auto 1rem;
+      padding: 1.75rem 2rem;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(20,24,37,0.96), rgba(30,36,51,0.92));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
 
-        .problem-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 2.5rem;
-            font-weight: 900;
-            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: slideDown 1s ease-out;
-        }
+    .problem-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.4rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: slideDown 0.6s ease-out;
+    }
 
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-50px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
+    .problem-tagline {
+      color: var(--text-secondary);
+      margin-top: 0.35rem;
+      max-width: 820px;
+    }
 
-        .problem-tagline {
-            font-size: 1.05rem;
-            color: var(--text-secondary);
-            margin-top: .35rem;
-            animation: fadeIn 1s ease-out .3s backwards;
-        }
+    .difficulty-badge {
+      display: inline-block;
+      padding: 0.5rem 1.4rem;
+      border-radius: 999px;
+      border: 2px solid var(--warning);
+      color: var(--warning);
+      background: rgba(255,186,8,0.16);
+      font-weight: 600;
+      font-size: 0.95rem;
+      white-space: nowrap;
+    }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to   { opacity: 1; }
-        }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-        .difficulty-badge {
-            display: inline-block;
-            padding: .5rem 1.5rem;
-            background: rgba(255,186,8,.2);
-            border: 2px solid var(--warning);
-            border-radius: 30px;
-            color: var(--warning);
-            font-weight: 600;
-            animation: fadeIn 1s ease-out .5s backwards;
-        }
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: rgba(10,14,26,0.95);
+      backdrop-filter: blur(10px);
+      padding: 0.95rem 2rem;
+    }
 
-        /* ── Nav ── */
-        nav {
-            position: sticky; top: 0;
-            background: rgba(10,14,26,.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--border);
-            padding: 1rem 2rem;
-            z-index: 1000;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    .nav-links {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
 
-        .nav-links { display: flex; gap: 1.5rem; list-style: none; flex-wrap: wrap; }
+    .nav-tab-link {
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      padding: 0;
+      font-family: inherit;
+      font-weight: 500;
+      cursor: pointer;
+      position: relative;
+      transition: color 0.2s;
+    }
 
-        .nav-tab-link {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: .9rem;
-            transition: color .3s;
-            position: relative;
-            background: transparent;
-            border: none;
-            padding: 0;
-            font-family: inherit;
-            cursor: pointer;
-        }
+    .nav-tab-link::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: -4px;
+      width: 0;
+      height: 2px;
+      background: var(--accent-primary);
+      transition: width 0.2s;
+    }
 
-        .nav-tab-link::after {
-            content: '';
-            position: absolute;
-            bottom: -5px; left: 0;
-            width: 0; height: 2px;
-            background: var(--accent-primary);
-            transition: width .3s;
-        }
+    .nav-tab-link:hover,
+    .nav-tab-link.active {
+      color: var(--accent-primary);
+    }
 
-        .nav-tab-link:hover,
-        .nav-tab-link.active { color: var(--accent-primary); }
-        .nav-tab-link:hover::after,
-        .nav-tab-link.active::after { width: 100%; }
+    .nav-tab-link:hover::after,
+    .nav-tab-link.active::after {
+      width: 100%;
+    }
 
-        /* ── Sections ── */
-        .container { max-width: 1200px; margin: 0 auto; padding: 3rem 2rem; }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem 3rem;
+    }
 
-        .section { display: none; }
-        .section.active-page {
-            display: block;
-            animation: fadeIn .35s ease;
-        }
+    .section {
+      display: none;
+    }
 
-        .section-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 2.8rem;
-            margin-bottom: 1.75rem;
-            background: linear-gradient(135deg, var(--accent-primary), var(--accent-tertiary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+    .section.active-page {
+      display: block;
+      animation: fadeIn 0.25s ease;
+    }
 
-        /* ── Cards ── */
-        .card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            transition: transform .3s, box-shadow .3s;
-        }
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 40px rgba(0,212,255,.18);
-        }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
 
-        .card h3 { font-size: 1.25rem; margin-bottom: .75rem; color: var(--accent-primary); }
-        .card h4 { font-size: 1rem; margin: 1.25rem 0 .5rem; color: var(--text-primary); }
-        .card p  { color: var(--text-secondary); }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.4rem;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-tertiary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
 
-        /* ── Stats grid ── */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.25rem;
-            margin: 2rem 0;
-        }
+    .card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
 
-        .stat-card {
-            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
-            padding: 1.75rem;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
+    .card h2,
+    .card h3,
+    .card h4 {
+      margin: 0.6rem 0 0.5rem;
+      color: var(--accent-primary);
+    }
 
-        .stat-card::before {
-            content: '';
-            position: absolute; top: 0; left: 0;
-            width: 100%; height: 4px;
-            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
-        }
+    .card p {
+      color: var(--text-secondary);
+      margin: 0.55rem 0;
+    }
 
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--accent-primary);
-            font-family: 'JetBrains Mono', monospace;
-        }
+    .card code {
+      background: rgba(255,255,255,0.08);
+      border-radius: 6px;
+      padding: 0.05rem 0.35rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      color: #bcefff;
+    }
 
-        .stat-label { color: var(--text-secondary); margin-top: .4rem; font-size: .85rem; }
+    .card pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      overflow-x: auto;
+      margin: 0.9rem 0;
+      line-height: 1.5;
+    }
 
-        /* ── Code blocks ── */
-        .code-block {
-            background: var(--code-bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1.25rem 1.5rem;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: .88rem;
-            overflow-x: auto;
-            margin: 1.25rem 0;
-            white-space: pre;
-        }
+    .card pre code {
+      background: transparent;
+      padding: 0;
+      color: var(--text-primary);
+      font-size: 0.86rem;
+      display: block;
+    }
 
-        .code-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: .75rem;
-            padding-bottom: .5rem;
-            border-bottom: 1px solid var(--border);
-        }
+    .card ul,
+    .card ol {
+      margin: 0.45rem 0 0.7rem 1.3rem;
+      color: var(--text-secondary);
+    }
 
-        .code-lang { color: var(--accent-primary); font-weight: 600; font-size: .72rem; text-transform: uppercase; }
+    .card li { margin: 0.2rem 0; }
 
-        .copy-btn {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border);
-            color: var(--text-secondary);
-            padding: .35rem .9rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: .72rem;
-            transition: all .3s;
-        }
-        .copy-btn:hover { background: var(--accent-primary); color: var(--bg-primary); border-color: var(--accent-primary); }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.8rem;
+      margin-bottom: 1.2rem;
+    }
 
-        /* syntax colours */
-        .kw  { color: #ff79c6; }
-        .fn  { color: #50fa7b; }
-        .st  { color: #f1fa8c; }
-        .cm  { color: var(--text-muted); }
-        .nm  { color: #bd93f9; }
+    .meta-pill {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.7rem 0.9rem;
+      background: var(--bg-tertiary);
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
 
-        /* ── Alerts ── */
-        .alert {
-            padding: 1rem 1.5rem;
-            border-radius: 8px;
-            margin: 1.25rem 0;
-            display: flex;
-            align-items: flex-start;
-            gap: 1rem;
-        }
-        .alert-info    { background: rgba(0,212,255,.1);  border: 1px solid var(--accent-primary); color: var(--accent-primary); }
-        .alert-warning { background: rgba(255,186,8,.1);  border: 1px solid var(--warning);        color: var(--warning); }
-        .alert-success { background: rgba(0,255,148,.1);  border: 1px solid var(--success);        color: var(--success); }
-        .alert-danger  { background: rgba(255,0,110,.1);  border: 1px solid var(--danger);         color: var(--danger); }
+    .meta-pill strong { color: var(--text-primary); }
 
-        /* ── Tabs ── */
-        .tabs {
-            display: flex;
-            gap: .75rem;
-            border-bottom: 2px solid var(--border);
-            margin-bottom: 1.75rem;
-            flex-wrap: wrap;
-        }
+    .small-note {
+      color: var(--text-secondary);
+      font-size: 0.92rem;
+      margin-top: 0.35rem;
+    }
 
-        .tab {
-            padding: .75rem 1.5rem;
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-size: .95rem;
-            font-weight: 500;
-            transition: all .3s;
-            position: relative;
-            font-family: inherit;
-        }
-        .tab.active { color: var(--accent-primary); }
-        .tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: -2px; left: 0;
-            width: 100%; height: 2px;
-            background: var(--accent-primary);
-        }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn .4s; }
+    a {
+      color: var(--accent-primary);
+    }
 
-        /* ── Step-by-step ── */
-        .steps-list { display: flex; flex-direction: column; gap: 1.5rem; }
+    @media (max-width: 880px) {
+      .problem-header {
+        flex-direction: column;
+        align-items: flex-start;
+        margin: 0.75rem;
+        padding: 1.2rem;
+      }
 
-        .step {
-            display: flex;
-            gap: 1.5rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 1px solid var(--border);
-        }
-        .step:last-child { border-bottom: none; padding-bottom: 0; }
+      .problem-title {
+        font-size: 2rem;
+      }
 
-        .step-num {
-            flex-shrink: 0;
-            width: 46px; height: 46px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: 1.2rem;
-        }
+      nav {
+        padding: 0.8rem 1rem;
+      }
 
-        .step-body h3 { font-size: 1.05rem; color: var(--accent-primary); margin-bottom: .4rem; }
-        .step-body p  { color: var(--text-secondary); font-size: .95rem; }
+      .container {
+        padding: 1.6rem 1rem 2.4rem;
+      }
 
-        /* ── Grid ── */
-        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 1.75rem; }
-
-        /* ── Quiz ── */
-        .quiz-block {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.75rem;
-            margin-bottom: 1.75rem;
-        }
-
-        .quiz-q { font-size: 1.1rem; margin-bottom: 1.25rem; }
-
-        .quiz-options { display: flex; flex-direction: column; gap: .75rem; }
-
-        .quiz-opt {
-            background: var(--bg-tertiary);
-            border: 2px solid var(--border);
-            padding: .9rem 1.25rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all .25s;
-            display: flex;
-            align-items: center;
-            gap: .75rem;
-            font-size: .95rem;
-        }
-        .quiz-opt:hover { border-color: var(--accent-primary); background: rgba(0,212,255,.08); }
-        .quiz-opt.correct  { border-color: var(--success); background: rgba(0,255,148,.12); }
-        .quiz-opt.incorrect{ border-color: var(--danger);  background: rgba(255,0,110,.12); }
-        .quiz-opt.locked   { pointer-events: none; }
-
-        .quiz-feedback {
-            margin-top: 1rem;
-            padding: .85rem 1.1rem;
-            border-radius: 8px;
-            display: none;
-            font-size: .93rem;
-        }
-        .quiz-feedback.show { display: block; animation: slideIn .4s; }
-        .quiz-feedback.correct  { background: rgba(0,255,148,.08);  border: 1px solid var(--success); color: var(--success); }
-        .quiz-feedback.incorrect{ background: rgba(255,0,110,.08);  border: 1px solid var(--danger);  color: var(--danger); }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-16px); }
-            to   { opacity: 1; transform: translateX(0); }
-        }
-
-        /* ── Btn ── */
-        .btn {
-            padding: .7rem 1.75rem;
-            border: 2px solid var(--accent-primary);
-            background: transparent;
-            color: var(--accent-primary);
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: .95rem;
-            font-family: inherit;
-            transition: all .3s;
-            margin-top: .75rem;
-        }
-        .btn:hover {
-            background: var(--accent-primary);
-            color: var(--bg-primary);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0,212,255,.3);
-        }
-        .btn:disabled { opacity: .4; cursor: not-allowed; }
-
-        /* ── Visualizer ── */
-        .viz-wrap {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.75rem;
-            margin-bottom: 2rem;
-        }
-
-        .viz-controls { display: flex; gap: .75rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
-
-        .viz-input {
-            padding: .7rem 1rem;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: .9rem;
-            width: 160px;
-        }
-
-        .state-display {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1.25rem;
-            margin-bottom: 1.25rem;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: .75rem;
-        }
-
-        .state-item { display: flex; flex-direction: column; gap: .2rem; }
-        .state-label { color: var(--text-secondary); font-size: .8rem; }
-        .state-val   { color: var(--accent-primary); font-family: 'JetBrains Mono', monospace; font-size: .95rem; }
-
-        .tree-container {
-            background: var(--bg-tertiary);
-            border-radius: 8px;
-            padding: 1.5rem;
-            overflow-x: auto;
-            min-height: 300px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* ── Playground ── */
-        .editor {
-            background: var(--code-bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1rem;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: .88rem;
-            min-height: 280px;
-            color: var(--text-primary);
-            resize: vertical;
-            width: 100%;
-        }
-
-        .run-output {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1.25rem;
-            margin-top: .75rem;
-            min-height: 80px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: .88rem;
-            color: var(--text-secondary);
-        }
-
-        /* ── Flashcards ── */
-        .fc-wrap { perspective: 1000px; margin-bottom: 1.5rem; }
-
-        .fc {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 3rem 2rem;
-            cursor: pointer;
-            min-height: 220px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            position: relative;
-            transition: transform .6s;
-            transform-style: preserve-3d;
-        }
-
-        .fc:hover { box-shadow: 0 8px 30px rgba(0,212,255,.15); }
-        .fc.flipped { transform: rotateY(180deg); }
-
-        .fc-front, .fc-back {
-            position: absolute;
-            width: 100%; height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            backface-visibility: hidden;
-            padding: 2rem;
-            border-radius: 12px;
-            flex-direction: column;
-            gap: .75rem;
-        }
-
-        .fc-back { transform: rotateY(180deg); }
-        .fc-front h3 { font-size: 1.15rem; color: var(--text-primary); }
-        .fc-back  p  { font-size: .95rem;  color: var(--text-secondary); }
-        .fc-hint { font-size: .78rem; color: var(--text-muted); margin-top: .5rem; }
-
-        /* ── Comparison table ── */
-        .cmp-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: .9rem; }
-        .cmp-table th {
-            padding: .85rem 1rem;
-            text-align: left;
-            color: var(--accent-primary);
-            border-bottom: 2px solid var(--border);
-        }
-        .cmp-table td { padding: .85rem 1rem; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
-        .cmp-table tr:last-child td { border-bottom: none; }
-        .cmp-table td:first-child { color: var(--text-primary); font-weight: 600; }
-
-        /* ── Mistake pairs ── */
-        .mistake-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: .75rem 0; }
-        @media (max-width: 700px) { .mistake-pair { grid-template-columns: 1fr; } }
-
-        .mistake-wrong  .code-lang { color: var(--danger); }
-        .mistake-right  .code-lang { color: var(--success); }
-
-        /* ── Checklist ── */
-        .checklist { list-style: none; padding: 0; }
-        .checklist li {
-            padding: .6rem 0;
-            display: flex;
-            align-items: flex-start;
-            gap: .75rem;
-            color: var(--text-secondary);
-            border-bottom: 1px solid var(--border);
-            font-size: .95rem;
-        }
-        .checklist li:last-child { border-bottom: none; }
-        .checklist li::before { content: '✓'; color: var(--success); font-weight: 700; flex-shrink: 0; }
-
-        /* ── Dry-run table ── */
-        .dr-table { width: 100%; border-collapse: collapse; font-size: .85rem; overflow-x: auto; display: block; }
-        .dr-table th {
-            padding: .6rem .9rem;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border);
-            color: var(--accent-primary);
-            white-space: nowrap;
-        }
-        .dr-table td {
-            padding: .55rem .9rem;
-            border: 1px solid var(--border);
-            color: var(--text-secondary);
-            font-family: 'JetBrains Mono', monospace;
-            white-space: nowrap;
-        }
-        .dr-table tr:nth-child(even) td { background: rgba(255,255,255,.02); }
-
-        /* ── Responsive ── */
-        @media (max-width: 768px) {
-            .problem-header { flex-direction: column; align-items: flex-start; margin: .75rem; padding: 1.25rem; }
-            .problem-title  { font-size: 2rem; }
-            .section-title  { font-size: 2rem; }
-            .grid-2         { grid-template-columns: 1fr; }
-            .nav-links      { gap: .75rem; }
-        }
-    </style>
+      .section-title {
+        font-size: 2rem;
+      }
+    }
+  </style>
 </head>
 <body>
-
 <div class="progress-bar" id="progressBar"></div>
 
 <header class="problem-header">
-    <div>
-        <h1 class="problem-title">Combination Sum</h1>
-        <p class="problem-tagline">Find all combinations that sum to a target — backtracking with pruning and unlimited reuse</p>
-    </div>
-    <span class="difficulty-badge">MEDIUM</span>
+  <div>
+    <h1 class="problem-title">Combination Sum</h1>
+    <p class="problem-tagline">Pattern: Backtracking | Platform: LeetCode / NeetCode</p>
+  </div>
+  <div class="difficulty-badge">Medium</div>
 </header>
 
 <nav>
-    <div style="font-weight:700;font-size:1.1rem;color:var(--accent-primary);white-space:nowrap;">LC 39</div>
-    <ul class="nav-links">
-        <li><button class="nav-tab-link" data-section="problem">Problem</button></li>
-        <li><button class="nav-tab-link" data-section="concepts">Concepts</button></li>
-        <li><button class="nav-tab-link" data-section="walkthrough">Walkthrough</button></li>
-        <li><button class="nav-tab-link" data-section="visualizer">Visualizer</button></li>
-        <li><button class="nav-tab-link" data-section="quiz">Quiz</button></li>
-        <li><button class="nav-tab-link" data-section="playground">Playground</button></li>
-        <li><button class="nav-tab-link" data-section="alternatives">Alternatives</button></li>
-        <li><button class="nav-tab-link" data-section="mistakes">Mistakes</button></li>
-        <li><button class="nav-tab-link" data-section="flashcards">Flashcards</button></li>
-        <li><button class="nav-tab-link" data-section="reference">Reference</button></li>
-        <li><button class="nav-tab-link" data-section="next-steps">Next Steps</button></li>
-    </ul>
+  <ul class="nav-links">
+    <li><button class="nav-tab-link" data-section="overview">Overview</button></li>
+<li><button class="nav-tab-link" data-section="problem-statement">Problem Statement</button></li>
+<li><button class="nav-tab-link" data-section="core-concepts">Core Concepts</button></li>
+<li><button class="nav-tab-link" data-section="step-by-step-walkthrough">Step-by-Step Walkthrough</button></li>
+<li><button class="nav-tab-link" data-section="interactive-visualizer-markdown-compatible-spec">Interactive Visualizer (Markdown-Compatible Spec)</button></li>
+<li><button class="nav-tab-link" data-section="knowledge-check-quiz">Knowledge Check (Quiz)</button></li>
+<li><button class="nav-tab-link" data-section="code-playground">Code Playground</button></li>
+<li><button class="nav-tab-link" data-section="alternative-approaches">Alternative Approaches</button></li>
+<li><button class="nav-tab-link" data-section="common-mistakes">Common Mistakes</button></li>
+<li><button class="nav-tab-link" data-section="flashcards">Flashcards</button></li>
+  </ul>
 </nav>
 
-<div class="container">
-
-<!-- ════════════════════════════════ PROBLEM ════════════════════════════════ -->
-<section id="problem" class="section">
-    <h2 class="section-title">Problem Statement</h2>
-
+<main class="container">
+  <section id="overview" class="section">
+    <h2 class="section-title">Overview</h2>
     <div class="card">
-        <h3>Challenge</h3>
-        <p>Given a list of <strong>distinct</strong> integers <code style="color:var(--accent-primary)">nums</code> and an integer <code style="color:var(--accent-primary)">target</code>, return all unique combinations where chosen numbers sum to <code style="color:var(--accent-primary)">target</code>.</p>
-        <ul style="margin:1rem 0 0 1.25rem;color:var(--text-secondary);font-size:.95rem;">
-            <li>You can use each value in <code>nums</code> <strong>unlimited times</strong>.</li>
-            <li>Two combinations are the same if they contain the same values with the same frequencies.</li>
-            <li>Output order does not matter.</li>
-        </ul>
-
-        <div class="grid-2" style="margin-top:1.75rem;">
-            <div>
-                <h4>Example 1</h4>
-                <div class="code-block"><div class="code-header"><span class="code-lang">Input / Output</span></div><span class="kw">Input :</span>  nums = [2, 5, 6, 9], target = 9
-<span class="kw">Output:</span>  [[2, 2, 5], [9]]
-
-<span class="cm"># 2 + 2 + 5 = 9  and  9 = 9.</span></div>
-            </div>
-            <div>
-                <h4>Example 2</h4>
-                <div class="code-block"><div class="code-header"><span class="code-lang">Input / Output</span></div><span class="kw">Input :</span>  nums = [3, 4, 5], target = 16
-<span class="kw">Output:</span>  [[3,3,3,3,4], [3,3,5,5], [3,4,4,5], [4,4,4,4]]
-
-<span class="cm"># All unique frequency combos that sum to 16.</span></div>
-            </div>
-        </div>
-
-        <div class="alert alert-info" style="margin-top:1.5rem;">
-            <span style="font-size:1.4rem;flex-shrink:0;">💡</span>
-            <div><strong>Key Insight:</strong> Build combinations in non-decreasing index order so <code>[2,5,2]</code> is never generated separately from <code>[2,2,5]</code>. Reusing a number is achieved by recursing with the <strong>same index</strong> <code>j</code>. Sorting enables early pruning: once <code>total + nums[j] &gt; target</code>, all later values are also too large.</div>
-        </div>
+      <div class="meta-grid">
+        <div class="meta-pill"><strong>Platform:</strong> LeetCode / NeetCode</div>
+<div class="meta-pill"><strong>Difficulty:</strong> Medium</div>
+<div class="meta-pill"><strong>Pattern:</strong> Backtracking</div>
+<div class="meta-pill"><strong>Primary Tags:</strong> Backtracking, Recursion, DFS</div>
+<div class="meta-pill"><strong>Status:</strong> Not Started</div>
+<div class="meta-pill"><strong>Last Updated:</strong> 2026-04-16</div>
+      </div>
+      <p class="small-note">Generated from context file: <code>md/lc-39-combination-sum.md</code></p>
     </div>
+  </section>
 
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-value">O(2^(t/m))</div>
-            <div class="stat-label">Time Complexity</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value">O(t/m)</div>
-            <div class="stat-label">Space (recursion depth)</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value">t/m</div>
-            <div class="stat-label">Max Recursion Depth</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value">Pruning</div>
-            <div class="stat-label">Early break on sorted array</div>
-        </div>
-    </div>
-</section>
-
-<!-- ════════════════════════════════ CONCEPTS ════════════════════════════════ -->
-<section id="concepts" class="section">
-    <h2 class="section-title">Core Concepts</h2>
-
-    <div class="tabs">
-        <button class="tab active" data-tab="c-backtracking">Backtracking</button>
-        <button class="tab" data-tab="c-decision">Decision Tree</button>
-        <button class="tab" data-tab="c-when">When to Use</button>
-    </div>
-
-    <div id="c-backtracking" class="tab-content active">
-        <div class="card">
-            <h3>Pattern Definition</h3>
-            <p>State is a partially built combination <code>cur</code> and current sum <code>total</code>. At each state, choose next candidate from current start index onward. Recurse with the <strong>same</strong> index to allow unlimited reuse, then backtrack.</p>
-
-            <h4>Core Loop</h4>
-            <div class="code-block"><div class="code-header"><span class="code-lang">Python — Pattern Skeleton</span></div><span class="kw">def</span> <span class="fn">dfs</span>(i, total):
-    <span class="kw">if</span> total == target:
-        record(cur.<span class="fn">copy</span>())
-        <span class="kw">return</span>
-    <span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(i, <span class="fn">len</span>(nums)):
-        <span class="kw">if</span> total + nums[j] > target:
-            <span class="kw">break</span>
-        cur.<span class="fn">append</span>(nums[j])
-        <span class="fn">dfs</span>(j, total + nums[j])
-        cur.<span class="fn">pop</span>()</div>
-
-            <div class="alert alert-warning" style="margin-top:1.25rem;">
-                <span style="font-size:1.3rem;flex-shrink:0;">⚠️</span>
-                <div><strong>Important Caveat:</strong> After choosing <code>nums[j]</code>, recurse with <code>dfs(j, ...)</code> — not <code>dfs(j+1, ...)</code>. Using <code>j+1</code> forbids reuse and misses combinations like <code>[2,2,3]</code>.</div>
-            </div>
-        </div>
-    </div>
-
-    <div id="c-decision" class="tab-content">
-        <div class="card">
-            <h3>Decision Process / State View</h3>
-            <p>State at each recursive call: <code>(i, cur, total)</code></p>
-            <ul style="margin:.75rem 0 0 1.25rem;color:var(--text-secondary);font-size:.95rem;">
-                <li><code>i</code> — minimum index allowed next (keeps combinations unique)</li>
-                <li><code>cur</code> — current chosen numbers</li>
-                <li><code>total</code> — sum of numbers in <code>cur</code></li>
-            </ul>
-
-            <div class="code-block" style="margin-top:1.25rem;"><div class="code-header"><span class="code-lang">Decision Tree — nums = [2, 5, 6, 9], target = 9</span></div>dfs(i=0, cur=[], total=0)
-├── choose 2  →  dfs(i=0, cur=[2], total=2)
-│   ├── choose 2  →  dfs(i=0, cur=[2,2], total=4)
-│   │   ├── choose 2  →  dfs(i=0, cur=[2,2,2], total=6)
-│   │   │   ├── choose 2  →  total=8 → next 2 would be 10 → prune
-│   │   │   └── choose 5  →  total=9 → record [2,2,5] ✓
-│   │   └── choose 5  →  total=9 → record [2,2,5] already found at lower branch
-│   └── (deeper branches all exceed or miss target)
-└── choose 9  →  dfs(i=3, cur=[9], total=9)  →  record [9] ✓</div>
-
-            <div class="alert alert-info" style="margin-top:1rem;">
-                <span style="font-size:1.2rem;flex-shrink:0;">📊</span>
-                <div>Max recursion depth ≈ <code>target / min(nums)</code>. For target=9, min=2: depth ≈ 4.</div>
-            </div>
-        </div>
-    </div>
-
-    <div id="c-when" class="tab-content">
-        <div class="card">
-            <h3>When to Use This Pattern</h3>
-            <h4>Trigger Signals</h4>
-            <ul class="checklist">
-                <li>Problem asks to enumerate <em>all</em> combinations (not just count or one solution).</li>
-                <li>Choices can be repeated (unbounded pick).</li>
-                <li>Order should not create duplicates.</li>
-                <li>Constraints are small enough for exponential search.</li>
-                <li>"Find all unique combinations" phrasing.</li>
-            </ul>
-
-            <h4>Related Problems</h4>
-            <ul class="checklist">
-                <li>Combination Sum II — each number used at most once (LC 40)</li>
-                <li>Combination Sum III — exactly k numbers summing to n (LC 216)</li>
-                <li>Subsets (LC 78)</li>
-                <li>Permutations (LC 46)</li>
-                <li>Palindrome Partitioning (LC 131)</li>
-            </ul>
-        </div>
-    </div>
-</section>
-
-<!-- ════════════════════════════════ WALKTHROUGH ════════════════════════════════ -->
-<section id="walkthrough" class="section">
-    <h2 class="section-title">Step-by-Step Walkthrough</h2>
-
-    <div class="card">
-        <div class="steps-list">
-            <div class="step">
-                <div class="step-num">1</div>
-                <div class="step-body">
-                    <h3>Initialize result, path, and sort</h3>
-                    <div class="code-block"><div class="code-header"><span class="code-lang">Python</span></div>res = []
-cur = []
-nums.<span class="fn">sort</span>()</div>
-                    <p><code>res</code> stores complete answers, <code>cur</code> is the current path; sorting enables early pruning.</p>
-                </div>
-            </div>
-
-            <div class="step">
-                <div class="step-num">2</div>
-                <div class="step-body">
-                    <h3>Define DFS state <code>dfs(i, total)</code></h3>
-                    <div class="code-block"><div class="code-header"><span class="code-lang">Python</span></div><span class="kw">def</span> <span class="fn">dfs</span>(i, total):
-    ...</div>
-                    <p><code>i</code> controls allowed start index (uniqueness); <code>total</code> tracks current sum.</p>
-                </div>
-            </div>
-
-            <div class="step">
-                <div class="step-num">3</div>
-                <div class="step-body">
-                    <h3>Base case: target reached → record combination</h3>
-                    <div class="code-block"><div class="code-header"><span class="code-lang">Python</span></div>    <span class="kw">if</span> total == target:
-        res.<span class="fn">append</span>(cur.<span class="fn">copy</span>())
-        <span class="kw">return</span></div>
-                    <p>This path is a valid combination. <strong>Copy</strong> is essential — <code>cur</code> is mutated by backtracking.</p>
-                </div>
-            </div>
-
-            <div class="step">
-                <div class="step-num">4</div>
-                <div class="step-body">
-                    <h3>Iterate candidates from index <code>i</code> onward</h3>
-                    <div class="code-block"><div class="code-header"><span class="code-lang">Python</span></div>    <span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(i, <span class="fn">len</span>(nums)):
-        ...</div>
-                    <p>Starting from <code>i</code> (not 0) prevents generating permutations of the same combination.</p>
-                </div>
-            </div>
-
-            <div class="step">
-                <div class="step-num">5</div>
-                <div class="step-body">
-                    <h3>Prune impossible branches</h3>
-                    <div class="code-block"><div class="code-header"><span class="code-lang">Python</span></div>        <span class="kw">if</span> total + nums[j] > target:
-            <span class="kw">break</span></div>
-                    <p>Sorted array guarantees all later numbers are also too large — <code>break</code> cuts the whole suffix.</p>
-                </div>
-            </div>
-
-            <div class="step">
-                <div class="step-num">6</div>
-                <div class="step-body">
-                    <h3>Choose current number and recurse</h3>
-                    <div class="code-block"><div class="code-header"><span class="code-lang">Python</span></div>        cur.<span class="fn">append</span>(nums[j])
-        <span class="fn">dfs</span>(j, total + nums[j])</div>
-                    <p>Pass <code>j</code> (not <code>j+1</code>) so the same number can be picked again — unlimited reuse.</p>
-                </div>
-            </div>
-
-            <div class="step">
-                <div class="step-num">7</div>
-                <div class="step-body">
-                    <h3>Backtrack to restore state</h3>
-                    <div class="code-block"><div class="code-header"><span class="code-lang">Python</span></div>        cur.<span class="fn">pop</span>()</div>
-                    <p>Removes last decision before trying next candidate. State is restored for sibling branches.</p>
-                </div>
-            </div>
-
-            <div class="step">
-                <div class="step-num">8</div>
-                <div class="step-body">
-                    <h3>Start DFS and return result</h3>
-                    <div class="code-block"><div class="code-header"><span class="code-lang">Python</span></div><span class="fn">dfs</span>(<span class="nm">0</span>, <span class="nm">0</span>)
-<span class="kw">return</span> res</div>
-                    <p>Begin with empty path and sum zero; return all found combinations.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Complete Solution -->
-    <div class="card">
-        <h3>Complete Solution (Primary)</h3>
-        <div class="code-block">
-            <div class="code-header">
-                <span class="code-lang">Python</span>
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-            </div><span class="kw">from</span> typing <span class="kw">import</span> List
-
-<span class="kw">class</span> <span class="fn">Solution</span>:
-    <span class="kw">def</span> <span class="fn">combinationSum</span>(self, nums: List[int], target: int) -> List[List[int]]:
-        nums.<span class="fn">sort</span>()
-        res = []
-        cur = []
-
-        <span class="kw">def</span> <span class="fn">dfs</span>(i, total):
-            <span class="kw">if</span> total == target:
-                res.<span class="fn">append</span>(cur.<span class="fn">copy</span>())
-                <span class="kw">return</span>
-            <span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(i, <span class="fn">len</span>(nums)):
-                nxt = total + nums[j]
-                <span class="kw">if</span> nxt > target:
-                    <span class="kw">break</span>
-                cur.<span class="fn">append</span>(nums[j])
-                <span class="fn">dfs</span>(j, nxt)
-                cur.<span class="fn">pop</span>()
-
-        <span class="fn">dfs</span>(<span class="nm">0</span>, <span class="nm">0</span>)
-        <span class="kw">return</span> res
-
-<span class="fn">print</span>(<span class="fn">Solution</span>().<span class="fn">combinationSum</span>([<span class="nm">2</span>, <span class="nm">5</span>, <span class="nm">6</span>, <span class="nm">9</span>], <span class="nm">9</span>))
-<span class="cm"># Expected: [[2, 2, 5], [9]] (order may vary)</span></div>
-    </div>
-
-    <!-- Dry Run -->
-    <div class="card">
-        <h3>Dry Run — nums = [2, 5, 6, 9], target = 9</h3>
-        <div style="overflow-x:auto;margin-top:1rem;">
-            <table class="dr-table">
-                <thead>
-                    <tr>
-                        <th>Call</th>
-                        <th>Action</th>
-                        <th>cur after</th>
-                        <th>total</th>
-                        <th>res after</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr><td>dfs(0,0)</td><td>choose 2</td><td>[2]</td><td>2</td><td>—</td></tr>
-                    <tr><td>dfs(0,2)</td><td>choose 2</td><td>[2,2]</td><td>4</td><td>—</td></tr>
-                    <tr><td>dfs(0,4)</td><td>choose 2</td><td>[2,2,2]</td><td>6</td><td>—</td></tr>
-                    <tr><td>dfs(0,6)</td><td>choose 2 → 8, choose 5 → 11 prune</td><td>[2,2,2]</td><td>6</td><td>—</td></tr>
-                    <tr><td>dfs(0,6)</td><td>choose 5 → 11 prune → break</td><td>[2,2,2]</td><td>6</td><td>—</td></tr>
-                    <tr><td>back to dfs(0,4)</td><td>pop 2; choose 5 → total=9</td><td>[2,2,5]</td><td>9</td><td>—</td></tr>
-                    <tr><td>dfs(1,9)</td><td>total == target → record copy</td><td>[2,2,5]</td><td>9</td><td>[[2,2,5]]</td></tr>
-                    <tr><td>back to dfs(0,4)</td><td>pop 5; choose 6 → 10 prune → break</td><td>[2,2]</td><td>4</td><td>—</td></tr>
-                    <tr><td>back to dfs(0,2)</td><td>pop 2; deeper branches all exceed</td><td>[2]</td><td>2</td><td>—</td></tr>
-                    <tr><td>back to dfs(0,0)</td><td>pop 2; choose 5 → total=5; …exceeds; pop</td><td>[]</td><td>0</td><td>—</td></tr>
-                    <tr><td>dfs(0,0)</td><td>choose 9 → total=9 → record copy</td><td>[9]</td><td>9</td><td>[[2,2,5],[9]]</td></tr>
-                </tbody>
-            </table>
-        </div>
-        <p style="margin-top:1rem;font-family:'JetBrains Mono',monospace;font-size:.88rem;color:var(--success);">Final res: [[2, 2, 5], [9]]</p>
-    </div>
-</section>
-
-<!-- ════════════════════════════════ VISUALIZER ════════════════════════════════ -->
-<section id="visualizer" class="section">
-    <h2 class="section-title">Interactive Visualizer</h2>
-
-    <div class="viz-wrap">
-        <div class="viz-controls">
-            <input class="viz-input" id="vizNums" type="text" value="2,5,6,9" placeholder="nums e.g. 2,5,6,9">
-            <input class="viz-input" id="vizTarget" type="number" value="9" placeholder="target" style="width:80px;">
-            <button class="btn" onclick="startViz()" style="margin-top:0;">Start</button>
-            <button class="btn" id="stepBtn" onclick="stepViz()" disabled style="margin-top:0;">Next Step</button>
-            <button class="btn" id="resetBtn" onclick="resetViz()" disabled style="margin-top:0;">Reset</button>
-        </div>
-
-        <div class="state-display">
-            <div class="state-item"><span class="state-label">Index (i)</span><span class="state-val" id="stI">—</span></div>
-            <div class="state-item"><span class="state-label">cur</span><span class="state-val" id="stCur">[]</span></div>
-            <div class="state-item"><span class="state-label">total</span><span class="state-val" id="stTotal">—</span></div>
-            <div class="state-item"><span class="state-label">Action</span><span class="state-val" id="stAction">—</span></div>
-            <div class="state-item"><span class="state-label">res count</span><span class="state-val" id="stRes">0</span></div>
-        </div>
-
-        <div class="tree-container" id="treeViz">
-            <p style="color:var(--text-secondary);">Enter nums and target, then click Start to visualize.</p>
-        </div>
-    </div>
-
-    <div class="card">
-        <h3>Visualizer Spec</h3>
-        <h4>State Fields Tracked</h4>
-        <ul class="checklist">
-            <li><code>i</code> — current start index for candidate choices.</li>
-            <li><code>cur</code> — current partial combination (list of integers).</li>
-            <li><code>total</code> — current sum of elements in <code>cur</code>.</li>
-            <li><code>action</code> — most recent operation (enter / choose / record / prune / backtrack).</li>
-            <li><code>res_count</code> — number of valid combinations found so far.</li>
-        </ul>
-        <h4>Step Events</h4>
-        <ul class="checklist">
-            <li><strong>enter</strong> — New DFS call: <code>i</code> and <code>total</code> set; <code>cur</code> unchanged.</li>
-            <li><strong>choose</strong> — Pick <code>nums[j]</code>: append to <code>cur</code>; total becomes <code>total + nums[j]</code>.</li>
-            <li><strong>record</strong> — Base case: copy of <code>cur</code> appended to res; <code>res_count += 1</code>.</li>
-            <li><strong>prune</strong> — <code>total + nums[j] &gt; target</code>: skip this branch and all right siblings.</li>
-            <li><strong>backtrack</strong> — After recursive call: <code>cur.pop()</code>; total restored.</li>
-        </ul>
-    </div>
-</section>
-
-<!-- ════════════════════════════════ QUIZ ════════════════════════════════ -->
-<section id="quiz" class="section">
-    <h2 class="section-title">Knowledge Check</h2>
-
-    <!-- Q1 -->
-    <div class="quiz-block" id="qb1">
-        <p class="quiz-q"><strong>Q1 — Complexity:</strong> What is the typical backtracking time complexity for Combination Sum?</p>
-        <div class="quiz-options">
-            <div class="quiz-opt" onclick="checkQ(1,'A',false,this)"><strong>A)</strong> O(n)</div>
-            <div class="quiz-opt" onclick="checkQ(1,'B',false,this)"><strong>B)</strong> O(n log n)</div>
-            <div class="quiz-opt" onclick="checkQ(1,'C',true,this)"><strong>C)</strong> O(2^(t/m)) where t = target, m = min(nums)</div>
-            <div class="quiz-opt" onclick="checkQ(1,'D',false,this)"><strong>D)</strong> O(t²)</div>
-        </div>
-        <div class="quiz-feedback" id="qf1">
-            <strong>Answer: C</strong> — Recursion depth is bounded by <code>target / min(nums)</code>. At each level there are multiple branching choices, giving an exponential tree of size O(2^(t/m)).
-        </div>
-    </div>
-
-    <!-- Q2 -->
-    <div class="quiz-block" id="qb2">
-        <p class="quiz-q"><strong>Q2 — Correctness Invariant:</strong> Which invariant prevents duplicate permutations like <code>[2,5,2]</code> and <code>[2,2,5]</code> both appearing?</p>
-        <div class="quiz-options">
-            <div class="quiz-opt" onclick="checkQ(2,'A',false,this)"><strong>A)</strong> We sort the final result and deduplicate.</div>
-            <div class="quiz-opt" onclick="checkQ(2,'B',false,this)"><strong>B)</strong> We always recurse with <code>j + 1</code>.</div>
-            <div class="quiz-opt" onclick="checkQ(2,'C',true,this)"><strong>C)</strong> We only choose indices from the current <code>i</code> forward, keeping each path in non-decreasing index order.</div>
-            <div class="quiz-opt" onclick="checkQ(2,'D',false,this)"><strong>D)</strong> We use a set of tuples to de-duplicate every path.</div>
-        </div>
-        <div class="quiz-feedback" id="qf2">
-            <strong>Answer: C</strong> — Restricting candidates to <code>range(i, len(nums))</code> means once we move past an index, we never revisit it, so every combination is generated in canonical non-decreasing order.
-        </div>
-    </div>
-
-    <!-- Q3 -->
-    <div class="quiz-block" id="qb3">
-        <p class="quiz-q"><strong>Q3 — Edge Case:</strong> What does the algorithm return for <code>nums = [3]</code>, <code>target = 5</code>?</p>
-        <div class="quiz-options">
-            <div class="quiz-opt" onclick="checkQ(3,'A',false,this)"><strong>A)</strong> <code>[[3, 2]]</code></div>
-            <div class="quiz-opt" onclick="checkQ(3,'B',false,this)"><strong>B)</strong> <code>[[3]]</code></div>
-            <div class="quiz-opt" onclick="checkQ(3,'C',true,this)"><strong>C)</strong> <code>[]</code></div>
-            <div class="quiz-opt" onclick="checkQ(3,'D',false,this)"><strong>D)</strong> Raises a RuntimeError</div>
-        </div>
-        <div class="quiz-feedback" id="qf3">
-            <strong>Answer: C</strong> — 3 cannot be repeatedly added to reach exactly 5 (3, 6, 9… — none equals 5). The pruning fires at 6 and no combination is recorded, so the result is empty <code>[]</code>.
-        </div>
-    </div>
-
-    <!-- Q4 -->
-    <div class="quiz-block" id="qb4">
-        <p class="quiz-q"><strong>Q4 — Implementation Pitfall:</strong> After choosing <code>nums[j]</code>, the next recursive call should be…</p>
-        <div class="quiz-options">
-            <div class="quiz-opt" onclick="checkQ(4,'A',false,this)"><strong>A)</strong> <code>dfs(j + 1, total + nums[j])</code> — advance to next index</div>
-            <div class="quiz-opt" onclick="checkQ(4,'B',false,this)"><strong>B)</strong> <code>dfs(0, total + nums[j])</code> — restart from beginning</div>
-            <div class="quiz-opt" onclick="checkQ(4,'C',true,this)"><strong>C)</strong> <code>dfs(j, total + nums[j])</code> — stay at same index for reuse</div>
-            <div class="quiz-opt" onclick="checkQ(4,'D',false,this)"><strong>D)</strong> <code>dfs(i + 1, total + nums[j])</code> — advance outer loop index</div>
-        </div>
-        <div class="quiz-feedback" id="qf4">
-            <strong>Answer: C</strong> — Passing <code>j</code> (not <code>j+1</code>) allows the same number to be picked again, which is required since each number can be used unlimited times. Using <code>j+1</code> would miss combinations like <code>[2,2,3]</code>.
-        </div>
-    </div>
-
-    <div class="alert alert-success" id="quizDone" style="display:none;">
-        <span style="font-size:1.3rem;flex-shrink:0;">🎉</span>
-        <div><strong>All 4 questions answered!</strong> Review any you missed, then head to the Playground.</div>
-    </div>
-</section>
-
-<!-- ════════════════════════════════ PLAYGROUND ════════════════════════════════ -->
-<section id="playground" class="section">
-    <h2 class="section-title">Code Playground</h2>
-
-    <div class="card">
-        <h3>Starter Code</h3>
-        <p style="margin-bottom:1rem;">Fill in the TODOs, then click <strong>Run</strong> to check against the expected output.</p>
-        <textarea class="editor" id="codeEditor">from typing import List
+  <section id="problem-statement" class="section">
+  <h2 class="section-title">Problem Statement</h2>
+  <div class="card">
+<h3>Challenge</h3>
+<p>Given a list of <strong>distinct</strong> integers <code>nums</code> and an integer <code>target</code>, return all unique combinations where chosen numbers sum to <code>target</code>.</p>
+<ul>
+<li>You can use each value in <code>nums</code> <strong>unlimited times</strong>.</li>
+<li>Two combinations are the same if they contain the same values with the same frequencies.</li>
+<li>Output order does not matter.</li>
+</ul>
+<h3>Examples</h3>
+<h4>Example 1</h4>
+<ul>
+<li>Input: <code>nums = [2, 5, 6, 9], target = 9</code></li>
+<li>Output: <code>[[2, 2, 5], [9]]</code></li>
+<li>Explanation: <code>2 + 2 + 5 = 9</code> and <code>9 = 9</code>.</li>
+</ul>
+<h4>Example 2</h4>
+<ul>
+<li>Input: <code>nums = [3, 4, 5], target = 16</code></li>
+<li>Output: <code>[[3,3,3,3,4], [3,3,5,5], [3,4,4,5], [4,4,4,4]]</code></li>
+<li>Explanation: These are all unique frequency combinations that sum to 16.</li>
+</ul>
+<pre><code class="language-python">from typing import List
 
 class Solution:
-    def combinationSum(self, nums: List[int], target: int) -> List[List[int]]:
-        nums.sort()
-        res = []
-        cur = []
-
-        def dfs(i, total):
-            # TODO: if total == target, append copy of cur to res
-
-            # TODO: iterate j from i to len(nums)-1
-
-            # TODO: prune when total + nums[j] > target
-
-            # TODO: choose nums[j], recurse with dfs(j, ...), backtrack
-            pass
-
-        dfs(0, 0)
-        return res
-
-print(Solution().combinationSum([2, 5, 6, 9], 9))
-# Expected (order may vary): [[2, 2, 5], [9]]</textarea>
-        <div style="display:flex;gap:.75rem;margin-top:.75rem;flex-wrap:wrap;">
-            <button class="btn" onclick="runCode()" style="margin-top:0;">Run</button>
-            <button class="btn" onclick="resetCode()" style="margin-top:0;">Reset</button>
-            <button class="btn" onclick="showSolution()" style="margin-top:0;border-color:var(--accent-tertiary);color:var(--accent-tertiary);">Show Solution</button>
-        </div>
-        <div class="run-output" id="runOutput">Output will appear here…</div>
-    </div>
-
-    <div class="card">
-        <h3>Suggested Experiments</h3>
-        <div class="steps-list">
-            <div class="step">
-                <div class="step-num">1</div>
-                <div class="step-body">
-                    <h3>Constraint variant — each number used at most k times</h3>
-                    <p>Modify <code>dfs</code> so that each value in <code>nums</code> can be picked at most <code>k</code> times per combination. What additional state do you need?</p>
-                </div>
-            </div>
-            <div class="step">
-                <div class="step-num">2</div>
-                <div class="step-body">
-                    <h3>Alternative paradigm — iterative DP by sum</h3>
-                    <p>Build a DP table where <code>dp[s]</code> stores all combinations summing to <code>s</code>, filling from 0 to target. Verify it produces the same output as backtracking.</p>
-                </div>
-            </div>
-            <div class="step">
-                <div class="step-num">3</div>
-                <div class="step-body">
-                    <h3>Optimization task — count only, no listing</h3>
-                    <p>Return just the <em>count</em> of valid combinations without listing them. Is a simple integer DP possible? What is its complexity vs. backtracking?</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ════════════════════════════════ ALTERNATIVES ════════════════════════════════ -->
-<section id="alternatives" class="section">
-    <h2 class="section-title">Alternative Approaches</h2>
-
-    <div class="tabs">
-        <button class="tab active" data-tab="alt-incskip">Include/Skip</button>
-        <button class="tab" data-tab="alt-dp">DP by Sum</button>
-        <button class="tab" data-tab="alt-cmp">Comparison</button>
-    </div>
-
-    <div id="alt-incskip" class="tab-content active">
-        <div class="card">
-            <h3>Alternative 1: Include/Skip Binary Backtracking</h3>
-            <p><strong>Intuition:</strong> At each index, either include the current value (stay at same index for reuse) or skip to the next index. Two branches per call — matches the classic subset decision tree.</p>
-            <div class="code-block">
-                <div class="code-header">
-                    <span class="code-lang">Python</span>
-                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                </div><span class="kw">from</span> typing <span class="kw">import</span> List
-
-<span class="kw">def</span> <span class="fn">combinationSum_include_skip</span>(nums: List[int], target: int) -> List[List[int]]:
-    res = []
-    cur = []
-
-    <span class="kw">def</span> <span class="fn">dfs</span>(i, total):
-        <span class="kw">if</span> total == target:
-            res.<span class="fn">append</span>(cur.<span class="fn">copy</span>())
-            <span class="kw">return</span>
-        <span class="kw">if</span> i >= <span class="fn">len</span>(nums) <span class="kw">or</span> total > target:
-            <span class="kw">return</span>
-        cur.<span class="fn">append</span>(nums[i])
-        <span class="fn">dfs</span>(i, total + nums[i])     <span class="cm"># include: stay at i</span>
-        cur.<span class="fn">pop</span>()
-        <span class="fn">dfs</span>(i + <span class="nm">1</span>, total)           <span class="cm"># skip: move to i+1</span>
-
-    <span class="fn">dfs</span>(<span class="nm">0</span>, <span class="nm">0</span>)
-    <span class="kw">return</span> res
-
-<span class="fn">print</span>(<span class="fn">combinationSum_include_skip</span>([<span class="nm">2</span>, <span class="nm">5</span>, <span class="nm">6</span>, <span class="nm">9</span>], <span class="nm">9</span>))
-<span class="cm"># Expected (order may vary): [[2, 2, 5], [9]]</span></div>
-            <ul style="margin:1rem 0 0 1.25rem;color:var(--text-secondary);font-size:.9rem;">
-                <li>Time: O(2^(t/m))</li>
-                <li>Space: O(t/m) recursion depth.</li>
-                <li><strong>When to prefer:</strong> Teaching the classic include/exclude decision-tree pattern; makes the binary branching structure explicit.</li>
-            </ul>
-        </div>
-    </div>
-
-    <div id="alt-dp" class="tab-content">
-        <div class="card">
-            <h3>Alternative 2: DP by Sum (Build Combinations)</h3>
-            <p><strong>Intuition:</strong> Build combinations for each sum from 0 to target. <code>dp[s]</code> holds all combinations summing to <code>s</code>. Extend each using new candidates in non-decreasing order to avoid duplicates.</p>
-            <div class="code-block">
-                <div class="code-header">
-                    <span class="code-lang">Python</span>
-                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                </div><span class="kw">from</span> typing <span class="kw">import</span> List
-
-<span class="kw">def</span> <span class="fn">combinationSum_dp</span>(nums: List[int], target: int) -> List[List[int]]:
-    nums.<span class="fn">sort</span>()
-    dp = [[] <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(target + <span class="nm">1</span>)]
-    dp[<span class="nm">0</span>] = [[]]
-
-    <span class="kw">for</span> num <span class="kw">in</span> nums:
-        <span class="kw">for</span> s <span class="kw">in</span> <span class="fn">range</span>(num, target + <span class="nm">1</span>):
-            <span class="kw">for</span> prev <span class="kw">in</span> dp[s - num]:
-                <span class="kw">if</span> <span class="kw">not</span> prev <span class="kw">or</span> prev[-<span class="nm">1</span>] <= num:
-                    dp[s].<span class="fn">append</span>(prev + [num])
-
-    <span class="kw">return</span> dp[target]
-
-<span class="fn">print</span>(<span class="fn">combinationSum_dp</span>([<span class="nm">2</span>, <span class="nm">5</span>, <span class="nm">6</span>, <span class="nm">9</span>], <span class="nm">9</span>))
-<span class="cm"># Expected (order may vary): [[2, 2, 5], [9]]</span></div>
-            <ul style="margin:1rem 0 0 1.25rem;color:var(--text-secondary);font-size:.9rem;">
-                <li>Time: roughly O(target × K) where K depends on combination counts.</li>
-                <li>Space: O(total combinations stored across dp table).</li>
-                <li><strong>When to prefer:</strong> When you want bottom-up construction with no recursion stack.</li>
-            </ul>
-        </div>
-    </div>
-
-    <div id="alt-cmp" class="tab-content">
-        <div class="card">
-            <h3>Comparison Table</h3>
-            <table class="cmp-table">
-                <thead>
-                    <tr>
-                        <th>Approach</th>
-                        <th>Pros</th>
-                        <th>Cons</th>
-                        <th>Time</th>
-                        <th>Space</th>
-                        <th>Best Use Case</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Sorted-loop backtracking (primary)</td>
-                        <td>Clean, strong pruning, interview-standard</td>
-                        <td>Still exponential worst-case</td>
-                        <td>O(2^(t/m))</td>
-                        <td>O(t/m)</td>
-                        <td>Most interviews</td>
-                    </tr>
-                    <tr>
-                        <td>Include/Skip backtracking</td>
-                        <td>Very intuitive decision tree; easy to teach</td>
-                        <td>More branches, less pruning</td>
-                        <td>O(2^(t/m))</td>
-                        <td>O(t/m)</td>
-                        <td>Learning recursion pattern</td>
-                    </tr>
-                    <tr>
-                        <td>DP by sum</td>
-                        <td>Iterative, no recursion stack</td>
-                        <td>Higher memory; trickier duplicate avoidance</td>
-                        <td>Output-dependent</td>
-                        <td>Output-dependent</td>
-                        <td>Small target, iterative preference</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</section>
-
-<!-- ════════════════════════════════ MISTAKES ════════════════════════════════ -->
-<section id="mistakes" class="section">
-    <h2 class="section-title">Common Mistakes</h2>
-
-    <div class="card">
-        <h3 style="color:var(--danger);">Mistake 1: Recursing with j+1 — breaks unlimited reuse</h3>
-        <div class="mistake-pair">
-            <div class="mistake-wrong">
-                <div class="code-block"><div class="code-header"><span class="code-lang">Wrong</span></div>cur.<span class="fn">append</span>(nums[j])
-<span class="fn">dfs</span>(j + <span class="nm">1</span>, total + nums[j])  <span class="cm"># BUG</span>
-cur.<span class="fn">pop</span>()
-
-<span class="cm"># misses [2,2,3] for target 7 on [2,3,6,7]</span></div>
-            </div>
-            <div class="mistake-right">
-                <div class="code-block"><div class="code-header"><span class="code-lang">Correct</span></div>cur.<span class="fn">append</span>(nums[j])
-<span class="fn">dfs</span>(j, total + nums[j])      <span class="cm"># stay at j</span>
-cur.<span class="fn">pop</span>()
-
-<span class="cm"># correctly includes [2,2,3]</span></div>
-            </div>
-        </div>
-        <p><strong>Why it fails:</strong> Advancing to <code>j+1</code> forbids picking the same number again, missing all combinations that reuse values.</p>
-        <p><strong>Quick check:</strong> Verify <code>[2,2,3]</code> appears in the output for <code>nums=[2,3,6,7]</code>, <code>target=7</code>.</p>
-    </div>
-
-    <div class="card">
-        <h3 style="color:var(--danger);">Mistake 2: Forgetting to backtrack — corrupted paths</h3>
-        <div class="mistake-pair">
-            <div class="mistake-wrong">
-                <div class="code-block"><div class="code-header"><span class="code-lang">Wrong</span></div><span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(i, <span class="fn">len</span>(nums)):
-    <span class="kw">if</span> total + nums[j] > target:
-        <span class="kw">break</span>
-    cur.<span class="fn">append</span>(nums[j])
-    <span class="fn">dfs</span>(j, total + nums[j])
-    <span class="cm"># missing cur.pop() — BUG</span></div>
-            </div>
-            <div class="mistake-right">
-                <div class="code-block"><div class="code-header"><span class="code-lang">Correct</span></div><span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(i, <span class="fn">len</span>(nums)):
-    <span class="kw">if</span> total + nums[j] > target:
-        <span class="kw">break</span>
-    cur.<span class="fn">append</span>(nums[j])
-    <span class="fn">dfs</span>(j, total + nums[j])
-    cur.<span class="fn">pop</span>()  <span class="cm"># restore state</span></div>
-            </div>
-        </div>
-        <p><strong>Why it fails:</strong> Without <code>cur.pop()</code>, sibling branches inherit stale choices from prior iterations, producing corrupted paths.</p>
-        <p><strong>Quick check:</strong> Ensure <code>cur</code> length returns to its previous size after each recursive call.</p>
-    </div>
-
-    <div class="card">
-        <h3 style="color:var(--danger);">Mistake 3: Missing pruning — explores dead branches</h3>
-        <div class="mistake-pair">
-            <div class="mistake-wrong">
-                <div class="code-block"><div class="code-header"><span class="code-lang">Wrong (inefficient)</span></div><span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(i, <span class="fn">len</span>(nums)):
-    cur.<span class="fn">append</span>(nums[j])
-    <span class="fn">dfs</span>(j, total + nums[j])
-    cur.<span class="fn">pop</span>()
-<span class="cm"># no pruning — explores all branches</span></div>
-            </div>
-            <div class="mistake-right">
-                <div class="code-block"><div class="code-header"><span class="code-lang">Correct</span></div><span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(i, <span class="fn">len</span>(nums)):
-    <span class="kw">if</span> total + nums[j] > target:
-        <span class="kw">break</span>     <span class="cm"># pruning</span>
-    cur.<span class="fn">append</span>(nums[j])
-    <span class="fn">dfs</span>(j, total + nums[j])
-    cur.<span class="fn">pop</span>()</div>
-            </div>
-        </div>
-        <p><strong>Why it fails:</strong> Without <code>break</code>, the algorithm explores branches that can never reach the target, wasting work on a sorted array.</p>
-        <p><strong>Quick check:</strong> With sorted <code>nums</code>, always use <code>if total + nums[j] &gt; target: break</code>.</p>
-    </div>
-
-    <div class="card">
-        <h3 style="color:var(--danger);">Mistake 4: Appending <code>cur</code> reference instead of a copy</h3>
-        <div class="mistake-pair">
-            <div class="mistake-wrong">
-                <div class="code-block"><div class="code-header"><span class="code-lang">Wrong</span></div><span class="kw">if</span> total == target:
-    res.<span class="fn">append</span>(cur)         <span class="cm"># stores reference</span>
-    <span class="kw">return</span>
-
-<span class="cm"># all entries in res will be mutated
-# by subsequent pop() calls</span></div>
-            </div>
-            <div class="mistake-right">
-                <div class="code-block"><div class="code-header"><span class="code-lang">Correct</span></div><span class="kw">if</span> total == target:
-    res.<span class="fn">append</span>(cur.<span class="fn">copy</span>())   <span class="cm"># snapshot</span>
-    <span class="kw">return</span>
-
-<span class="cm"># each entry is an independent list</span></div>
-            </div>
-        </div>
-        <p><strong>Why it fails:</strong> <code>cur</code> is mutated by every <code>pop()</code> during backtracking. All entries in <code>res</code> that point to the same object get corrupted.</p>
-        <p><strong>Quick check:</strong> Always save <code>cur.copy()</code>; verify each element of <code>res</code> is a distinct object with <code>id()</code>.</p>
-    </div>
-</section>
-
-<!-- ════════════════════════════════ FLASHCARDS ════════════════════════════════ -->
-<section id="flashcards" class="section">
-    <h2 class="section-title">Flashcards</h2>
-    <p style="color:var(--text-secondary);margin-bottom:1.5rem;">Click each card to reveal the answer.</p>
-
-    <div class="fc-wrap">
-        <div class="fc" onclick="this.classList.toggle('flipped')">
-            <div class="fc-front">
-                <h3>When do we record and stop a path in Combination Sum?</h3>
-                <p class="fc-hint">(click to flip)</p>
-            </div>
-            <div class="fc-back">
-                <p>Record when <code>total == target</code> — copy <code>cur</code> and return. Prune a branch when the next sorted candidate would push <code>total</code> over <code>target</code> (<code>break</code> out of the loop).</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="fc-wrap">
-        <div class="fc" onclick="this.classList.toggle('flipped')">
-            <div class="fc-front">
-                <h3>Why is the time complexity exponential, and what controls the exponent?</h3>
-                <p class="fc-hint">(click to flip)</p>
-            </div>
-            <div class="fc-back">
-                <p>The recursion depth is bounded by <code>target / min(nums)</code> (max reuses of the smallest value). Each level branches over multiple candidates, giving <strong>O(2^(t/m))</strong> total states.</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="fc-wrap">
-        <div class="fc" onclick="this.classList.toggle('flipped')">
-            <div class="fc-front">
-                <h3>What ensures uniqueness — no duplicate permutations — without a set?</h3>
-                <p class="fc-hint">(click to flip)</p>
-            </div>
-            <div class="fc-back">
-                <p>Restrict choices to indices <code>j &ge; i</code> and recurse with the <strong>same</strong> <code>j</code> for reuse. This keeps each path in non-decreasing index order — every combination is generated exactly once in canonical form.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ════════════════════════════════ REFERENCE ════════════════════════════════ -->
-<section id="reference" class="section">
-    <h2 class="section-title">Quick Reference</h2>
-
-    <div class="card">
-        <h3>Template Code</h3>
-        <div class="code-block">
-            <div class="code-header">
-                <span class="code-lang">Python Template</span>
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-            </div><span class="kw">from</span> typing <span class="kw">import</span> List
-
-<span class="kw">class</span> <span class="fn">Solution</span>:
-    <span class="kw">def</span> <span class="fn">combinationSum</span>(self, nums: List[int], target: int) -> List[List[int]]:
-        nums.<span class="fn">sort</span>()
-        res = []
-        cur = []
-
-        <span class="kw">def</span> <span class="fn">dfs</span>(i, total):
-            <span class="kw">if</span> total == target:
-                res.<span class="fn">append</span>(cur.<span class="fn">copy</span>())
-                <span class="kw">return</span>
-            <span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(i, <span class="fn">len</span>(nums)):
-                nxt = total + nums[j]
-                <span class="kw">if</span> nxt > target:
-                    <span class="kw">break</span>
-                cur.<span class="fn">append</span>(nums[j])
-                <span class="fn">dfs</span>(j, nxt)
-                cur.<span class="fn">pop</span>()
-
-        <span class="fn">dfs</span>(<span class="nm">0</span>, <span class="nm">0</span>)
-        <span class="kw">return</span> res</div>
-    </div>
-
-    <div class="card">
-        <h3>Pattern Mnemonic</h3>
-        <p style="font-family:'JetBrains Mono',monospace;font-size:.95rem;color:var(--accent-primary);line-height:2;">
-            Sort → Initialize res/cur → Define dfs(i, total) → Base case: record copy → Loop j from i → Prune (break) → Choose + Recurse with j → Backtrack (pop) → Start dfs(0,0) → Return res
-        </p>
-    </div>
-
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-value">j</div>
-            <div class="stat-label">Recurse with same j (not j+1) for reuse</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value">2^(t/m)</div>
-            <div class="stat-label">Dominant growth term</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value">O(t/m)</div>
-            <div class="stat-label">Max recursion depth</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value">cur</div>
-            <div class="stat-label">Memory driver (path buffer)</div>
-        </div>
-    </div>
-</section>
-
-<!-- ════════════════════════════════ NEXT STEPS ════════════════════════════════ -->
-<section id="next-steps" class="section">
-    <h2 class="section-title">Next Steps</h2>
-
-    <div class="grid-2">
-        <div class="card">
-            <h3>Next Challenges</h3>
-            <ol style="margin-left:1.25rem;color:var(--text-secondary);line-height:2.1;font-size:.95rem;">
-                <li><strong>Combination Sum II</strong> (Medium, LC 40) — same problem but each number can be used <em>once</em>; requires sorting and skip-duplicate logic for repeated values.</li>
-                <li><strong>Combination Sum III</strong> (Medium, LC 216) — find all k-number combinations summing to n using digits 1–9.</li>
-                <li><strong>Subsets</strong> (Medium, LC 78) — generate the full power set; pure include/skip backtracking with no target pruning.</li>
-                <li><strong>Palindrome Partitioning</strong> (Medium, LC 131) — partition a string into palindromic substrings; backtracking with a validity check at each branch.</li>
-            </ol>
-        </div>
-
-        <div class="card">
-            <h3>Study Tips</h3>
-            <ul class="checklist">
-                <li><strong>Code from memory first:</strong> Close this guide and re-implement <code>combinationSum</code> using only the mnemonic. Test against the dry-run examples.</li>
-                <li><strong>Draw the decision tree:</strong> For <code>nums=[2,3]</code>, <code>target=6</code>, sketch the full tree on paper. Label each edge and each leaf with its sum.</li>
-                <li><strong>Spaced repetition:</strong> Review today, then again in 1 day, 3 days, 7 days, and 14 days. At each session, implement from scratch before re-reading.</li>
-                <li><strong>Extend the template:</strong> After mastering the base version, solve Combination Sum II — this forces you to understand where skip-duplicate logic slots in relative to the pruning break.</li>
-            </ul>
-        </div>
-    </div>
-</section>
-
-</div><!-- /container -->
-
-<script>
-// ── Section navigation ──────────────────────────────────────────────────────
-const allSections = Array.from(document.querySelectorAll('.container > .section'));
-const navButtons  = Array.from(document.querySelectorAll('.nav-tab-link'));
-const sectionIds  = new Set(allSections.map(s => s.id));
-
-function showSection(id) {
-    if (!sectionIds.has(id)) return;
-    allSections.forEach(s => s.classList.toggle('active-page', s.id === id));
-    navButtons.forEach(b  => b.classList.toggle('active', b.dataset.section === id));
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-navButtons.forEach(b => {
-    b.addEventListener('click', () => {
-        showSection(b.dataset.section);
-        history.replaceState(null, '', `#${b.dataset.section}`);
-    });
-});
-
-(function init() {
-    const hash = location.hash.replace('#', '');
-    showSection(sectionIds.has(hash) ? hash : (navButtons[0]?.dataset.section || 'problem'));
-})();
-
-window.addEventListener('hashchange', () => {
-    const id = location.hash.replace('#', '');
-    if (sectionIds.has(id)) showSection(id);
-});
-
-// ── Inner tabs ───────────────────────────────────────────────────────────────
-document.querySelectorAll('.tabs').forEach(tabBar => {
-    tabBar.addEventListener('click', e => {
-        const btn = e.target.closest('.tab');
-        if (!btn) return;
-        const tabId = btn.dataset.tab;
-        const section = btn.closest('.section');
-
-        tabBar.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        btn.classList.add('active');
-
-        section.querySelectorAll('.tab-content').forEach(tc => {
-            tc.classList.toggle('active', tc.id === tabId);
-        });
-    });
-});
-
-// ── Progress bar ─────────────────────────────────────────────────────────────
-window.addEventListener('scroll', () => {
-    const h = document.documentElement;
-    const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
-    document.getElementById('progressBar').style.width = pct + '%';
-});
-
-// ── Quiz ─────────────────────────────────────────────────────────────────────
-const answered = {};
-let answeredCount = 0;
-
-function checkQ(qNum, letter, correct, el) {
-    if (answered[qNum]) return;
-    answered[qNum] = true;
-    answeredCount++;
-
-    const block = document.getElementById(`qb${qNum}`);
-    block.querySelectorAll('.quiz-opt').forEach(o => o.classList.add('locked'));
-
-    el.classList.add(correct ? 'correct' : 'incorrect');
-
-    if (!correct) {
-        block.querySelectorAll('.quiz-opt').forEach(o => {
-            if (o.getAttribute('onclick').includes('true')) o.classList.add('correct');
-        });
-    }
-
-    const fb = document.getElementById(`qf${qNum}`);
-    fb.classList.add('show', correct ? 'correct' : 'incorrect');
-
-    if (answeredCount === 4) {
-        document.getElementById('quizDone').style.display = 'flex';
-    }
-}
-
-// ── Copy code ─────────────────────────────────────────────────────────────────
-function copyCode(btn) {
-    const block = btn.closest('.code-block');
-    const pre   = block.querySelector('pre') || block;
-    const tmp = document.createElement('div');
-    tmp.innerHTML = pre.innerHTML;
-    const text = tmp.textContent;
-    navigator.clipboard.writeText(text);
-    btn.textContent = 'Copied!';
-    btn.style.background = 'var(--success)';
-    btn.style.color = 'var(--bg-primary)';
-    setTimeout(() => {
-        btn.textContent = 'Copy';
-        btn.style.background = '';
-        btn.style.color = '';
-    }, 2000);
-}
-
-// ── Playground ───────────────────────────────────────────────────────────────
-const STARTER = `from typing import List
-
-class Solution:
-    def combinationSum(self, nums: List[int], target: int) -> List[List[int]]:
-        nums.sort()
-        res = []
-        cur = []
-
-        def dfs(i, total):
-            # TODO: if total == target, append copy of cur to res
-
-            # TODO: iterate j from i to len(nums)-1
-
-            # TODO: prune when total + nums[j] > target
-
-            # TODO: choose nums[j], recurse with dfs(j, ...), backtrack
-            pass
-
-        dfs(0, 0)
-        return res
-
-print(Solution().combinationSum([2, 5, 6, 9], 9))
-# Expected (order may vary): [[2, 2, 5], [9]]`;
-
-const SOLUTION = `from typing import List
-
-class Solution:
-    def combinationSum(self, nums: List[int], target: int) -> List[List[int]]:
+    def combinationSum(self, nums: List[int], target: int) -&gt; List[List[int]]:
         nums.sort()
         res = []
         cur = []
@@ -1569,8 +360,204 @@ class Solution:
                 res.append(cur.copy())
                 return
             for j in range(i, len(nums)):
+                if total + nums[j] &gt; target:
+                    break
+                cur.append(nums[j])
+                dfs(j, total + nums[j])
+                cur.pop()
+
+        dfs(0, 0)
+        return res
+
+sol = Solution()
+
+out1 = sol.combinationSum([2, 5, 6, 9], 9)
+assert sorted(map(tuple, out1)) == sorted(map(tuple, [[2, 2, 5], [9]]))
+print(out1)
+
+out2 = sol.combinationSum([3, 4, 5], 16)
+assert sorted(map(tuple, out2)) == sorted(map(tuple, [[3,3,3,3,4], [3,3,5,5], [3,4,4,5], [4,4,4,4]]))
+print(out2)</code></pre>
+<h3>Key Insight</h3>
+<p>Build combinations in non-decreasing index order, so <code>[2,5,2]</code> is never generated separately from <code>[2,2,5]</code>. Backtracking explores candidate choices from index <code>i</code> onward, and reusing a number is done by recursing with the <strong>same index</strong>. Sorting enables pruning: once <code>total + nums[j] &gt; target</code>, all later values are also too large.</p>
+<pre><code class="language-python"># Growth intuition for recursion depth bound ~ target / min(nums)
+def max_depth(target, nums):
+    return target // min(nums)
+
+print(max_depth(9, [2,5,6,9]))   # 4
+print(max_depth(16, [3,4,5]))    # 5</code></pre>
+<h3>Complexity Snapshot</h3>
+<ul>
+<li>Time: <code>O(2^(t/m))</code> (commonly cited backtracking bound)</li>
+<li><code>t = target</code>, <code>m = min(nums)</code></li>
+<li>Space: <code>O(t/m)</code> recursion depth (excluding output)</li>
+<li>Output size can be exponential and dominates in dense cases.</li>
+</ul>
+<hr />
+  </div>
+</section>
+
+<section id="core-concepts" class="section">
+  <h2 class="section-title">Core Concepts</h2>
+  <div class="card">
+<h3>Concept 1: Pattern Definition</h3>
+<p>This is a backtracking problem where state is a partially built combination <code>cur</code> and current sum <code>total</code>. At each state, choose next candidate from current start index onward.</p>
+<pre><code class="language-python"># Pattern skeleton (&lt;=10 lines)
+def dfs(i, total):
+    if total == target:
+        record(cur.copy())
+        return
+    for j in range(i, len(nums)):
+        if total + nums[j] &gt; target:
+            break
+        cur.append(nums[j])
+        dfs(j, total + nums[j])
+        cur.pop()</code></pre>
+<h3>Concept 2: Decision Process / State View</h3>
+<p>State: <code>(i, cur, total)</code></p>
+<ul>
+<li><code>i</code>: minimum index allowed next (keeps combinations unique)</li>
+<li><code>cur</code>: current chosen numbers</li>
+<li><code>total</code>: sum of numbers in <code>cur</code></li>
+</ul>
+<pre><code class="language-python">def trace_states(nums, target):
+    nums.sort()
+    cur = []
+
+    def dfs(i, total):
+        print(f&quot;enter i={i}, cur={cur}, total={total}&quot;)
+        if total == target:
+            print(f&quot;record i={i}, cur={cur}, total={total}&quot;)
+            return
+        for j in range(i, len(nums)):
+            nxt = total + nums[j]
+            if nxt &gt; target:
+                print(f&quot;prune j={j}, val={nums[j]}, total={total}&quot;)
+                break
+            print(f&quot;choose j={j}, val={nums[j]}&quot;)
+            cur.append(nums[j])
+            dfs(j, nxt)
+            cur.pop()
+            print(f&quot;backtrack j={j}, cur={cur}&quot;)
+
+    dfs(0, 0)
+
+trace_states([2, 5, 6, 9], 9)</code></pre>
+<h3>Concept 3: When to Use This Pattern</h3>
+<p>Use this pattern when:</p>
+<ul>
+<li>You need <strong>all</strong> combinations (not just count or one solution).</li>
+<li>Choices can be repeated (unbounded pick).</li>
+<li>Order should not create duplicates.</li>
+<li>Constraints are small enough for exponential search.</li>
+</ul>
+<p>Related problems:</p>
+<ul>
+<li>Combination Sum II</li>
+<li>Combination Sum III</li>
+<li>Subsets</li>
+<li>Permutations</li>
+<li>Palindrome Partitioning</li>
+</ul>
+<h3>Important Caveat</h3>
+<p>Most common mistake: moving to <code>j + 1</code> after choosing <code>nums[j]</code>. That incorrectly forbids reuse.</p>
+<pre><code class="language-python"># WRONG: disallows reuse because it advances index after choosing
+from typing import List
+
+def wrong(nums: List[int], target: int) -&gt; List[List[int]]:
+    nums.sort()
+    res, cur = [], []
+
+    def dfs(i, total):
+        if total == target:
+            res.append(cur.copy())
+            return
+        for j in range(i, len(nums)):
+            if total + nums[j] &gt; target:
+                break
+            cur.append(nums[j])
+            dfs(j + 1, total + nums[j])  # BUG
+            cur.pop()
+
+    dfs(0, 0)
+    return res
+
+print(wrong([2,3,6,7], 7))  # misses [2,2,3]
+
+# FIX: recurse with dfs(j, ...) so same value can be picked again</code></pre>
+<hr />
+  </div>
+</section>
+
+<section id="step-by-step-walkthrough" class="section">
+  <h2 class="section-title">Step-by-Step Walkthrough</h2>
+  <div class="card">
+<ol>
+<li>Initialize result and path containers.</li>
+</ol>
+<pre><code class="language-python">res = []
+cur = []
+nums.sort()</code></pre>
+<p>Why: <code>res</code> stores complete answers, <code>cur</code> is current path, sorting enables prune.</p>
+<ol>
+<li>Define DFS state <code>(i, total)</code>.</li>
+</ol>
+<pre><code class="language-python">def dfs(i, total):
+    ...</code></pre>
+<p>Why: <code>i</code> controls allowed indices (uniqueness), <code>total</code> tracks current sum.</p>
+<ol>
+<li>Base case when target is reached.</li>
+</ol>
+<pre><code class="language-python">if total == target:
+    res.append(cur.copy())
+    return</code></pre>
+<p>Why: this path is a valid combination.</p>
+<ol>
+<li>Iterate choices from <code>i</code> onward.</li>
+</ol>
+<pre><code class="language-python">for j in range(i, len(nums)):
+    ...</code></pre>
+<p>Why: prevents generating permutations of same combination.</p>
+<ol>
+<li>Prune impossible branches.</li>
+</ol>
+<pre><code class="language-python">if total + nums[j] &gt; target:
+    break</code></pre>
+<p>Why: sorted array guarantees later numbers are larger.</p>
+<ol>
+<li>Choose current number and recurse.</li>
+</ol>
+<pre><code class="language-python">cur.append(nums[j])
+dfs(j, total + nums[j])</code></pre>
+<p>Why: <code>j</code> (not <code>j+1</code>) allows unlimited reuse.</p>
+<ol>
+<li>Backtrack to restore state.</li>
+</ol>
+<pre><code class="language-python">cur.pop()</code></pre>
+<p>Why: removes last decision before trying next candidate.</p>
+<ol>
+<li>Start DFS and return result.</li>
+</ol>
+<pre><code class="language-python">dfs(0, 0)
+return res</code></pre>
+<p>Why: begin with empty path and sum zero.</p>
+<h3>Complete Solution (Primary)</h3>
+<pre><code class="language-python">from typing import List
+
+class Solution:
+    def combinationSum(self, nums: List[int], target: int) -&gt; List[List[int]]:
+        nums.sort()
+        res = []
+        cur = []
+
+        def dfs(i, total):
+            if total == target:
+                res.append(cur.copy())
+                return
+
+            for j in range(i, len(nums)):
                 nxt = total + nums[j]
-                if nxt > target:
+                if nxt &gt; target:
                     break
                 cur.append(nums[j])
                 dfs(j, nxt)
@@ -1580,117 +567,435 @@ class Solution:
         return res
 
 print(Solution().combinationSum([2, 5, 6, 9], 9))
-# Expected (order may vary): [[2, 2, 5], [9]]`;
+# Expected: [[2, 2, 5], [9]] (order may vary)</code></pre>
+<h3>Dry Run</h3>
+<p>Input: <code>nums = [2, 5, 6, 9]</code>, <code>target = 9</code></p>
+<ul>
+<li>Start <code>dfs(0,0)</code>, <code>cur=[]</code></li>
+<li>Choose <code>2</code> -&gt; <code>cur=[2]</code>, total 2</li>
+<li>Choose <code>2</code> -&gt; <code>cur=[2,2]</code>, total 4</li>
+<li>Choose <code>2</code> -&gt; total 6</li>
+<li>Choose <code>2</code> -&gt; total 8</li>
+<li>Next <code>2</code> would make 10, prune branch</li>
+<li>Try <code>5</code> from total 4 -&gt; total 9, record <code>[2,2,5]</code></li>
+<li>Backtrack and try higher values; only <code>[9]</code> reaches target from root</li>
+</ul>
+<pre><code class="language-python">def dry_run_trace(nums, target):
+    nums.sort()
+    res = []
+    cur = []
 
-function runCode() {
-    const code = document.getElementById('codeEditor').value;
-    const out  = document.getElementById('runOutput');
-    out.style.color = 'var(--text-secondary)';
-    out.textContent = 'Simulating…';
+    def dfs(i, total):
+        print(f&quot;enter i={i}, total={total}, cur={cur}&quot;)
+        if total == target:
+            print(f&quot;record {cur}&quot;)
+            res.append(cur.copy())
+            return
 
-    setTimeout(() => {
-        if (code.includes('cur.copy()') && code.includes('dfs(j,') && code.includes('cur.pop()') && code.includes('break')) {
-            out.style.color = 'var(--success)';
-            out.textContent = '✓ Output:\n[[2, 2, 5], [9]]';
-        } else if (code.includes('TODO')) {
-            out.style.color = 'var(--warning)';
-            out.textContent = '⚠ TODOs not filled in yet. Complete the implementation first!';
-        } else {
-            out.style.color = 'var(--warning)';
-            out.textContent = '⚠ Implementation looks incomplete or incorrect. Check the walkthrough section.';
-        }
-    }, 400);
-}
+        for j in range(i, len(nums)):
+            nxt = total + nums[j]
+            if nxt &gt; target:
+                print(f&quot;prune at j={j}, val={nums[j]}, total={total}&quot;)
+                break
+            cur.append(nums[j])
+            print(f&quot;choose {nums[j]} -&gt; cur={cur}&quot;)
+            dfs(j, nxt)
+            cur.pop()
+            print(f&quot;backtrack -&gt; cur={cur}&quot;)
 
-function resetCode()    { document.getElementById('codeEditor').value = STARTER;   document.getElementById('runOutput').textContent = 'Output will appear here…'; document.getElementById('runOutput').style.color = ''; }
-function showSolution() { document.getElementById('codeEditor').value = SOLUTION; }
+    dfs(0, 0)
+    return res
 
-// ── Visualizer ───────────────────────────────────────────────────────────────
-let vizSteps = [], vizIdx = 0, vizNumsArr = [], vizTarget = 0;
+print(dry_run_trace([2, 5, 6, 9], 9))</code></pre>
+<hr />
+  </div>
+</section>
 
-function buildSteps(nums, target) {
-    const steps = [];
-    const cur = [];
-    const res = [];
+<section id="interactive-visualizer-markdown-compatible-spec" class="section">
+  <h2 class="section-title">Interactive Visualizer (Markdown-Compatible Spec)</h2>
+  <div class="card">
+<h3>Visualizer Input</h3>
+<ul>
+<li>Format: <code>{ &quot;nums&quot;: List[int], &quot;target&quot;: int }</code></li>
+<li>Sample: <code>{ &quot;nums&quot;: [2, 5, 6, 9], &quot;target&quot;: 9 }</code></li>
+</ul>
+<pre><code class="language-python">sample = {&quot;nums&quot;: [2, 5, 6, 9], &quot;target&quot;: 9}</code></pre>
+<h3>State Fields to Track</h3>
+<ul>
+<li><code>i</code>: current start index</li>
+<li><code>j</code>: current choice index in loop</li>
+<li><code>cur</code>: current path</li>
+<li><code>total</code>: current sum</li>
+<li><code>action</code>: <code>enter|choose|record|prune|backtrack</code></li>
+<li><code>res_count</code>: number of found combinations</li>
+</ul>
+<h3>Step Events</h3>
+<pre><code class="language-python">def event_stream(nums, target):
+    nums = sorted(nums)
+    cur = []
+    res = []
 
-    function dfs(i, total) {
-        steps.push({ i, cur: [...cur], total, action: `enter i=${i} total=${total}`, resCount: res.length });
-        if (total === target) {
-            res.push([...cur]);
-            steps.push({ i, cur: [...cur], total, action: 'record ✓', resCount: res.length });
-            return;
-        }
-        for (let j = i; j < nums.length; j++) {
-            const nxt = total + nums[j];
-            if (nxt > target) {
-                steps.push({ i, cur: [...cur], total, action: `prune j=${j} val=${nums[j]}`, resCount: res.length });
-                break;
-            }
-            cur.push(nums[j]);
-            steps.push({ i, cur: [...cur], total: nxt, action: `choose ${nums[j]}`, resCount: res.length });
-            dfs(j, nxt);
-            cur.pop();
-            steps.push({ i, cur: [...cur], total, action: `backtrack (pop ${nums[j]})`, resCount: res.length });
-        }
-    }
+    def dfs(i, total):
+        yield {&quot;action&quot;: &quot;enter&quot;, &quot;i&quot;: i, &quot;j&quot;: None, &quot;cur&quot;: cur.copy(), &quot;total&quot;: total, &quot;res_count&quot;: len(res)}
+        if total == target:
+            res.append(cur.copy())
+            yield {&quot;action&quot;: &quot;record&quot;, &quot;i&quot;: i, &quot;j&quot;: None, &quot;cur&quot;: cur.copy(), &quot;total&quot;: total, &quot;res_count&quot;: len(res)}
+            return
+        for j in range(i, len(nums)):
+            nxt = total + nums[j]
+            if nxt &gt; target:
+                yield {&quot;action&quot;: &quot;prune&quot;, &quot;i&quot;: i, &quot;j&quot;: j, &quot;cur&quot;: cur.copy(), &quot;total&quot;: total, &quot;res_count&quot;: len(res)}
+                break
+            cur.append(nums[j])
+            yield {&quot;action&quot;: &quot;choose&quot;, &quot;i&quot;: i, &quot;j&quot;: j, &quot;cur&quot;: cur.copy(), &quot;total&quot;: nxt, &quot;res_count&quot;: len(res)}
+            yield from dfs(j, nxt)
+            cur.pop()
+            yield {&quot;action&quot;: &quot;backtrack&quot;, &quot;i&quot;: i, &quot;j&quot;: j, &quot;cur&quot;: cur.copy(), &quot;total&quot;: total, &quot;res_count&quot;: len(res)}
 
-    dfs(0, 0);
-    return steps;
-}
+    yield from dfs(0, 0)
 
-function curStr(c) { return '[' + c.join(', ') + ']'; }
+for e in event_stream([2,5,6,9], 9):
+    print(e)</code></pre>
+<h3>Tree / Graph / Table Representation</h3>
+<p>Render as recursion tree where each node is <code>(cur,total)</code> and edge label is chosen value.</p>
+<hr />
+  </div>
+</section>
 
-function startViz() {
-    const rawNums = document.getElementById('vizNums').value;
-    vizNumsArr = rawNums.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
-    vizTarget  = parseInt(document.getElementById('vizTarget').value);
-    if (!vizNumsArr.length || isNaN(vizTarget)) { alert('Enter valid numbers and target'); return; }
-    vizNumsArr.sort((a, b) => a - b);
-    vizSteps = buildSteps(vizNumsArr, vizTarget);
-    vizIdx = 0;
+<section id="knowledge-check-quiz" class="section">
+  <h2 class="section-title">Knowledge Check (Quiz)</h2>
+  <div class="card">
+<ol>
+<li>What is the typical backtracking complexity bound for this problem?</li>
+<p>A. <code>O(n)</code> B. <code>O(n log n)</code> C. <code>O(2^(t/m))</code> D. <code>O(t^2)</code></p>
+</ol>
+<p>Correct: <strong>C</strong></p>
+<pre><code class="language-python"># Depth is bounded by target/min(nums), tree branching makes it exponential.
+target, nums = 16, [3,4,5]
+m = min(nums)
+print(target // m)  # depth upper bound indicator</code></pre>
+<ol>
+<li>Which invariant prevents duplicate permutations?</li>
+<p>A. Always sort output at the end B. Always recurse with j+1 C. Only choose indices from current i forward D. Use a set of tuples for every path</p>
+</ol>
+<p>Correct: <strong>C</strong></p>
+<pre><code class="language-python"># Forward-only index progression yields canonical order in each path.
+def demo_forward_only():
+    nums = [2,3]
+    paths = []
+    cur = []
+    def dfs(i, total):
+        if total == 5:
+            paths.append(cur.copy())
+            return
+        for j in range(i, len(nums)):
+            if total + nums[j] &gt; 5:
+                break
+            cur.append(nums[j])
+            dfs(j, total + nums[j])
+            cur.pop()
+    dfs(0, 0)
+    print(paths)  # [[2,3]] no [3,2]
 
-    // Simple step log display instead of SVG tree for combination sum
-    const container = document.getElementById('treeViz');
-    container.innerHTML = '<div id="stepLog" style="width:100%;font-family:JetBrains Mono,monospace;font-size:.82rem;color:var(--text-secondary);text-align:left;padding:.5rem;max-height:260px;overflow-y:auto;"></div>';
+demo_forward_only()</code></pre>
+<ol>
+<li>Edge case: <code>nums=[3]</code>, <code>target=5</code>. Output?</li>
+<p>A. <code>[[3,2]]</code> B. <code>[[3]]</code> C. <code>[]</code> D. Error</p>
+</ol>
+<p>Correct: <strong>C</strong></p>
+<pre><code class="language-python">print(Solution().combinationSum([3], 5))  # []</code></pre>
+<ol>
+<li>Implementation pitfall: after choosing <code>nums[j]</code>, next call should be?</li>
+<p>A. <code>dfs(j + 1, total + nums[j])</code> B. <code>dfs(0, total + nums[j])</code> C. <code>dfs(j, total + nums[j])</code> D. <code>dfs(i + 1, total + nums[j])</code></p>
+</ol>
+<p>Correct: <strong>C</strong></p>
+<pre><code class="language-python"># Reuse requires staying at j.
+nums = [2,3,6,7]
+print(Solution().combinationSum(nums, 7))  # contains [2,2,3]</code></pre>
+<hr />
+  </div>
+</section>
 
-    document.getElementById('stepBtn').disabled = false;
-    document.getElementById('resetBtn').disabled = false;
-    applyStep(vizSteps[0]);
-}
+<section id="code-playground" class="section">
+  <h2 class="section-title">Code Playground</h2>
+  <div class="card">
+<h3>Starter Code</h3>
+<pre><code class="language-python">from typing import List
 
-function applyStep(step) {
-    document.getElementById('stI').textContent      = step.i;
-    document.getElementById('stCur').textContent    = curStr(step.cur);
-    document.getElementById('stTotal').textContent  = step.total;
-    document.getElementById('stAction').textContent = step.action;
-    document.getElementById('stRes').textContent    = step.resCount;
+class Solution:
+    def combinationSum(self, nums: List[int], target: int) -&gt; List[List[int]]:
+        nums.sort()
+        res = []
+        cur = []
 
-    const log = document.getElementById('stepLog');
-    if (log) {
-        const line = document.createElement('div');
-        const isRecord = step.action.includes('record');
-        const isPrune  = step.action.includes('prune');
-        line.style.color = isRecord ? 'var(--success)' : isPrune ? 'var(--danger)' : 'var(--text-secondary)';
-        line.style.borderBottom = '1px solid rgba(255,255,255,.05)';
-        line.style.padding = '.2rem 0';
-        line.textContent = `[${vizIdx}] ${step.action}  cur=${curStr(step.cur)}  total=${step.total}`;
-        log.appendChild(line);
-        log.scrollTop = log.scrollHeight;
-    }
-}
+        def dfs(i, total):
+            # TODO: if total == target, append copy of cur to res
+            # TODO: iterate j from i to len(nums)-1
+            # TODO: prune when total + nums[j] &gt; target
+            # TODO: choose nums[j], recurse with dfs(j, ...), backtrack
+            pass
 
-function stepViz() {
-    if (vizIdx < vizSteps.length - 1) { vizIdx++; applyStep(vizSteps[vizIdx]); }
-}
+        dfs(0, 0)
+        return res
 
-function resetViz() {
-    vizSteps = []; vizIdx = 0; vizNumsArr = [];
-    ['stI','stCur','stTotal','stAction'].forEach(id => document.getElementById(id).textContent = '—');
-    document.getElementById('stRes').textContent = '0';
-    document.getElementById('stepBtn').disabled = true;
-    document.getElementById('resetBtn').disabled = true;
-    document.getElementById('treeViz').innerHTML = '<p style="color:var(--text-secondary)">Enter nums and target, then click Start to visualize.</p>';
-}
+print(Solution().combinationSum([2,5,6,9], 9))
+# Expected (order may vary): [[2,2,5], [9]]</code></pre>
+<h3>Suggested Experiments</h3>
+<ol>
+<li>Constraint variant: each number can be used at most <code>k</code> times.</li>
+</ol>
+<pre><code class="language-python">from typing import List
+
+def combinationSum_k(nums: List[int], target: int, k: int) -&gt; List[List[int]]:
+    # TODO: backtracking with usage count limit k per value
+    return []
+
+print(combinationSum_k([2,3,5], 8, 2))</code></pre>
+<ol>
+<li>Alternative paradigm: iterative DP that stores combinations by sum.</li>
+</ol>
+<pre><code class="language-python">from typing import List
+
+def combinationSum_dp(nums: List[int], target: int) -&gt; List[List[int]]:
+    # TODO: dp[s] = list of combinations that sum to s
+    return []
+
+print(combinationSum_dp([2,3,6,7], 7))</code></pre>
+<ol>
+<li>Optimization task: count combinations without listing them.</li>
+</ol>
+<pre><code class="language-python">from typing import List
+
+def countCombinationSum(nums: List[int], target: int) -&gt; int:
+    # TODO: return number of unique combinations (order-insensitive)
+    return 0
+
+print(countCombinationSum([2,3,6,7], 7))  # expected 2</code></pre>
+<hr />
+  </div>
+</section>
+
+<section id="alternative-approaches" class="section">
+  <h2 class="section-title">Alternative Approaches</h2>
+  <div class="card">
+<h3>Alternative 1: Include/Skip Binary Backtracking</h3>
+<p>Intuition: at each index, either include current value (stay at same index) or skip it (move to next index).</p>
+<pre><code class="language-python">from typing import List
+
+def combinationSum_include_skip(nums: List[int], target: int) -&gt; List[List[int]]:
+    res = []
+    cur = []
+
+    def dfs(i, total):
+        if total == target:
+            res.append(cur.copy())
+            return
+        if i &gt;= len(nums) or total &gt; target:
+            return
+
+        cur.append(nums[i])
+        dfs(i, total + nums[i])
+        cur.pop()
+
+        dfs(i + 1, total)
+
+    dfs(0, 0)
+    return res
+
+print(combinationSum_include_skip([2,5,6,9], 9))
+# Expected (order may vary): [[2,2,5], [9]]</code></pre>
+<ul>
+<li>Time: <code>O(2^(t/m))</code></li>
+<li>Space: <code>O(t/m)</code></li>
+<li>Prefer when teaching decision-tree include/exclude pattern.</li>
+</ul>
+<h3>Alternative 2: DP by Sum (Build Combinations)</h3>
+<p>Intuition: build combinations for each sum from <code>0</code> to <code>target</code>, ensuring non-decreasing order to avoid duplicates.</p>
+<pre><code class="language-python">from typing import List
+
+def combinationSum_dp(nums: List[int], target: int) -&gt; List[List[int]]:
+    nums.sort()
+    dp = [[] for _ in range(target + 1)]
+    dp[0] = [[]]
+
+    for num in nums:
+        for s in range(num, target + 1):
+            for prev in dp[s - num]:
+                if not prev or prev[-1] &lt;= num:
+                    dp[s].append(prev + [num])
+
+    return dp[target]
+
+print(combinationSum_dp([2,5,6,9], 9))
+# Expected (order may vary): [[2,2,5], [9]]</code></pre>
+<ul>
+<li>Time: roughly <code>O(target * K)</code> where <code>K</code> depends on combination counts</li>
+<li>Space: <code>O(total combinations stored across dp)</code></li>
+<li>Prefer when you want bottom-up construction and no recursion.</li>
+</ul>
+<h3>Comparison Table</h3>
+<p>| Approach | Pros | Cons | Time | Space | Best Use Case | |---|---|---|---|---|---| | Sorted-loop backtracking (primary) | Clean, strong pruning, interview-standard | Still exponential worst-case | <code>O(2^(t/m))</code> | <code>O(t/m)</code> + output | Most interviews | | Include/skip backtracking | Very intuitive decision tree | More branches, less pruning | <code>O(2^(t/m))</code> | <code>O(t/m)</code> + output | Learning recursion pattern | | DP by sum | Iterative, no recursion stack | Higher memory, trickier dedupe logic | Output-dependent | Output-dependent | Small <code>target</code>, iterative preference |</p>
+<hr />
+  </div>
+</section>
+
+<section id="common-mistakes" class="section">
+  <h2 class="section-title">Common Mistakes</h2>
+  <div class="card">
+<ol>
+<li>Recurse with <code>j + 1</code> after choose (breaks reuse)</li>
+</ol>
+<pre><code class="language-python"># Wrong
+from typing import List
+
+def wrong_reuse(nums: List[int], target: int) -&gt; List[List[int]]:
+    nums.sort()
+    res, cur = [], []
+    def dfs(i, total):
+        if total == target:
+            res.append(cur.copy())
+            return
+        for j in range(i, len(nums)):
+            if total + nums[j] &gt; target:
+                break
+            cur.append(nums[j])
+            dfs(j + 1, total + nums[j])
+            cur.pop()
+    dfs(0, 0)
+    return res
+
+print(wrong_reuse([2,3,6,7], 7))  # misses [2,2,3]</code></pre>
+<pre><code class="language-python"># Correct
+print(Solution().combinationSum([2,3,6,7], 7))  # includes [2,2,3] and [7]</code></pre>
+<p>Why fails: advancing index forbids picking the same number again. Quick check: verify <code>[2,2,3]</code> exists for target 7 on <code>[2,3,6,7]</code>.</p>
+<ol>
+<li>Forgetting to backtrack (<code>cur.pop()</code>)</li>
+</ol>
+<pre><code class="language-python"># Wrong
+from typing import List
+
+def wrong_no_pop(nums: List[int], target: int) -&gt; List[List[int]]:
+    nums.sort()
+    res, cur = [], []
+    def dfs(i, total):
+        if total == target:
+            res.append(cur.copy())
+            return
+        for j in range(i, len(nums)):
+            if total + nums[j] &gt; target:
+                break
+            cur.append(nums[j])
+            dfs(j, total + nums[j])
+            # missing cur.pop()
+    dfs(0, 0)
+    return res
+
+print(wrong_no_pop([2,5,6,9], 9))  # corrupted paths</code></pre>
+<pre><code class="language-python"># Correct: always pop after recursive call
+print(Solution().combinationSum([2,5,6,9], 9))</code></pre>
+<p>Why fails: sibling branches inherit stale choices. Quick check: ensure path length returns to previous size after each recursion.</p>
+<ol>
+<li>Not pruning when sorted candidate already exceeds target</li>
+</ol>
+<pre><code class="language-python"># Wrong-ish (correct but inefficient)
+from typing import List
+
+def slow_version(nums: List[int], target: int) -&gt; int:
+    nums.sort()
+    calls = 0
+    cur = []
+    def dfs(i, total):
+        nonlocal calls
+        calls += 1
+        if total == target:
+            return
+        if total &gt; target:
+            return
+        for j in range(i, len(nums)):
+            cur.append(nums[j])
+            dfs(j, total + nums[j])
+            cur.pop()
+    dfs(0, 0)
+    return calls
+
+print(slow_version([2,3,6,7], 7))</code></pre>
+<pre><code class="language-python"># Correct pruning strategy is in Solution().combinationSum with early break
+print(Solution().combinationSum([2,3,6,7], 7))</code></pre>
+<p>Why fails: explores many guaranteed-dead branches. Quick check: with sorted nums, use <code>if total + nums[j] &gt; target: break</code>.</p>
+<ol>
+<li>Appending <code>cur</code> directly instead of copy</li>
+</ol>
+<pre><code class="language-python"># Wrong
+from typing import List
+
+def wrong_ref(nums: List[int], target: int) -&gt; List[List[int]]:
+    nums.sort()
+    res, cur = [], []
+    def dfs(i, total):
+        if total == target:
+            res.append(cur)  # BUG: reference
+            return
+        for j in range(i, len(nums)):
+            if total + nums[j] &gt; target:
+                break
+            cur.append(nums[j])
+            dfs(j, total + nums[j])
+            cur.pop()
+    dfs(0, 0)
+    return res
+
+print(wrong_ref([2,5,6,9], 9))  # often ends up mutated/incorrect</code></pre>
+<pre><code class="language-python"># Correct
+print(Solution().combinationSum([2,5,6,9], 9))</code></pre>
+<p>Why fails: all saved answers point to same mutable list. Quick check: always save <code>cur.copy()</code>.</p>
+<hr />
+  </div>
+</section>
+
+<section id="flashcards" class="section">
+  <h2 class="section-title">Flashcards</h2>
+  <div class="card">
+<ol>
+<li><strong>Base case / stopping condition</strong></li>
+<p>Q: When do we record and stop a path in Combination Sum? A: Record when <code>total == target</code>; prune branch when next sorted number makes sum exceed target.</p>
+</ol>
+<ol>
+<li><strong>Complexity reasoning</strong></li>
+<p>Q: Why is complexity exponential? A: The recursion explores many candidate-branch combinations up to depth about <code>target / min(nums)</code>, giving a standard <code>O(2^(t/m))</code> backtracking bound.</p>
+</ol>
+<ol>
+<li><strong>Core pattern intuition</strong></li>
+<p>Q: What enforces uniqueness without a set? A: Restrict choices to indices <code>j &gt;= i</code> and recurse with same <code>j</code> for reuse; this keeps each path in non-decreasing index order.</p>
+</ol>
+  </div>
+</section>
+</main>
+
+<script>
+  const allSections = Array.from(document.querySelectorAll('.section'));
+  const navButtons  = Array.from(document.querySelectorAll('.nav-tab-link'));
+  const sectionIds  = new Set(allSections.map(s => s.id));
+
+  function showSection(id) {
+    allSections.forEach(s => s.classList.toggle('active-page', s.id === id));
+    navButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.section === id));
+    history.replaceState(null, '', '#' + id);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  navButtons.forEach(btn => {
+    btn.addEventListener('click', () => showSection(btn.dataset.section));
+  });
+
+  const hash = window.location.hash.replace('#', '');
+  showSection(sectionIds.has(hash) ? hash : (navButtons[0]?.dataset.section || 'overview'));
+
+  window.addEventListener('scroll', () => {
+    const h = document.documentElement;
+    const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+    const bar = document.getElementById('progressBar');
+    if (bar) bar.style.width = pct + '%';
+  });
 </script>
 </body>
 </html>
