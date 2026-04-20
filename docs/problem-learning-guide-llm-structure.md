@@ -405,9 +405,9 @@ Back: ...
 
 ## 6. HTML Reference File
 
-A canonical reference HTML file is stored at `REFERENCE.html` in the project root.
+A canonical reference HTML file is stored at `docs/REFERENCE.html`.
 
-**When converting any `.md` guide to `.html`, always read `REFERENCE.html` first** and match its:
+**When converting any `.md` guide to `.html`, always read `docs/REFERENCE.html` first** and match its:
 
 - CSS variables, fonts, and dark-theme styling exactly.
 - HTML structure: `progress-bar`, `problem-header`, `nav`, `.container > .section` layout.
@@ -433,26 +433,26 @@ All guide files must follow the pattern: `lc-{problem_number}-{slug}.{ext}`
 
 ```text
 index.html
-md/
+content/problems/
   lc-78-subsets-1.md
   lc-90-subsets-2.md
-html/
+site/problems/
   lc-78-subsets-1.html
   lc-90-subsets-2.html
 ```
 
 When generating a new problem guide, always produce **two files**:
 
-1. `md/lc-{number}-{slug}.md` — the full Markdown guide following this spec
-2. `html/lc-{number}-{slug}.html` — a rendered HTML version of the same guide
+1. `content/problems/lc-{number}-{slug}.md` — the full Markdown guide following this spec
+2. `site/problems/lc-{number}-{slug}.html` — a rendered HTML version of the same guide
 
-After creating the two files, always **update `index.html`** at the project root to add a link to the new `html/lc-{number}-{slug}.html`. The index should list all problems in ascending order by problem number. If `index.html` does not exist yet, create it with a simple, clean page that lists all current problems as links.
+After creating the two files, always **update `index.html`** at the project root to add a link to the new `site/problems/lc-{number}-{slug}.html`. The index should list all problems in ascending order by problem number. If `index.html` does not exist yet, create it with a simple, clean page that lists all current problems as links.
 
 **Examples:**
 
-- `md/lc-78-subsets-1.md` / `html/lc-78-subsets-1.html`
-- `md/lc-90-subsets-2.md` / `html/lc-90-subsets-2.html`
-- `md/lc-1-two-sum.md` / `html/lc-1-two-sum.html`
+- `content/problems/lc-78-subsets-1.md` / `site/problems/lc-78-subsets-1.html`
+- `content/problems/lc-90-subsets-2.md` / `site/problems/lc-90-subsets-2.html`
+- `content/problems/lc-1-two-sum.md` / `site/problems/lc-1-two-sum.html`
 
 ## 7. Notes for Future LLM Runs
 

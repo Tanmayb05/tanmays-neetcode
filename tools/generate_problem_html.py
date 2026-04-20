@@ -2,8 +2,8 @@
 """Generate reusable NeetCode problem HTML from context markdown.
 
 Usage:
-  python3 scripts/generate_problem_html.py --context md/lc-39-combination-sum.md
-  python3 scripts/generate_problem_html.py --context md/lc-39-combination-sum.md --out html/lc-39-combination-sum.html
+  python3 tools/generate_problem_html.py --context content/problems/lc-39-combination-sum.md
+  python3 tools/generate_problem_html.py --context content/problems/lc-39-combination-sum.md --out site/problems/lc-39-combination-sum.html
 """
 
 from __future__ import annotations
@@ -16,6 +16,8 @@ from typing import Dict, List, Tuple
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_TEMPLATE = ROOT / "templates" / "problem-guide.template.html"
+DEFAULT_CONTENT_DIR = ROOT / "content" / "problems"
+DEFAULT_OUTPUT_DIR = ROOT / "site" / "problems"
 
 
 def slugify(text: str) -> str:
@@ -318,7 +320,7 @@ def meta_pills(meta: Dict[str, str]) -> str:
 
 def guess_output_path(context_path: Path) -> Path:
     stem = context_path.stem
-    return ROOT / "html" / f"{stem}.html"
+    return DEFAULT_OUTPUT_DIR / f"{stem}.html"
 
 
 def main() -> None:
@@ -327,7 +329,7 @@ def main() -> None:
     parser.add_argument(
         "--all-md",
         action="store_true",
-        help="Generate HTML for all markdown files under md/",
+        help="Generate HTML for all markdown files under content/problems/",
     )
     parser.add_argument("--out", help="Optional output HTML path")
     parser.add_argument(
@@ -350,7 +352,7 @@ def main() -> None:
         raise SystemExit("Either --context or --all-md is required")
 
     if args.all_md:
-        md_dir = ROOT / "md"
+        md_dir = DEFAULT_CONTENT_DIR
         if not md_dir.exists():
             raise SystemExit(f"Directory not found: {md_dir}")
         contexts = sorted(md_dir.glob("*.md"))
